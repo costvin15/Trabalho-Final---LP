@@ -1,3 +1,9 @@
+//  ;=====================================
+//  ;  Title: util.h
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 10/13/18
+//  ;=====================================
+
 #ifndef UTIL_H
 #define UTIL_H
 

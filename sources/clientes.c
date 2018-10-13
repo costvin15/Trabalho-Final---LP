@@ -1,3 +1,9 @@
+//  ;=====================================
+//  ;  Title: clientes.c
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 10/13/18
+//  ;=====================================
+
 #include "../headers/clientes.h"
 
 Clientes *criar_clientes(){

@@ -1,3 +1,9 @@
+//  ;=====================================
+//  ;  Title: util.c
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 10/13/18
+//  ;=====================================
+
 #include "../headers/util.h"
 
 char *palavra_para_palavra_minuscula(char *palavra){

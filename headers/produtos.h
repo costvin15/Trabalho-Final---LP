@@ -1,3 +1,9 @@
+//  ;=====================================
+//  ;  Title: produtos.h
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 10/13/18
+//  ;=====================================
+
 #ifndef PRODUTOS_H
 #define PRODUTOS_H
 

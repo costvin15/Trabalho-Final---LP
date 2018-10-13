@@ -1,3 +1,9 @@
+//  ;=====================================
+//  ;  Title: produtos.c
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 10/13/18
+//  ;=====================================
+
 #include "../headers/produtos.h"
 
 Produtos *criar_produtos(){

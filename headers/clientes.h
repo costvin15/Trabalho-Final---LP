@@ -1,3 +1,9 @@
+//  ;=====================================
+//  ;  Title: clientes.h
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 10/13/18
+//  ;=====================================
+
 #ifndef CLIENTES_H
 #define CLIENTES_H
 
