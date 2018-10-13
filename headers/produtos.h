@@ -32,6 +32,6 @@ void popular_produtos(Produtos *);
 void salvar_produtos(Produtos *);
 
 void adicionar_produto(Produtos *, struct produto);
-struct produto **busca(Produtos *, char *, int *);
+struct produto **buscar_produto(Produtos *, char *, int *);
 
 #endif

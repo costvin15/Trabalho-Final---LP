@@ -4,81 +4,61 @@
 #include "headers/produtos.h"
 #include "headers/clientes.h"
 
-void adicionando(Clientes *);
-void lendo(Clientes *);
-void buscando(Clientes *);
+void adicionando(Produtos *);
+void lendo(Produtos *);
+void buscando(Produtos *);
 
 int main(void){
-    Clientes *lista;
-    lista = criar_clientes();
+    Produtos *lista;
+    lista = criar_produtos();
 
-    popular_clientes(lista);
+    popular_produtos(lista);
     
     adicionando(lista);
     lendo(lista);
 
     buscando(lista);
-    salvar_clientes(lista);
+    salvar_produtos(lista);
 
-    apagar_clientes(lista);
+    apagar_produtos(lista);
     return 0;
 }
 
-void adicionando(Clientes *lista){
+void adicionando(Produtos *lista){
     printf("***** ADICIONAR *****\n");
-
-    struct cliente c;
+    
+    struct produto p;
     while (1){
         printf("Nome: ");
-        gets(c.nome);
+        gets(p.nome);
+        printf("Em estoque: ");
+        scanf("%d", &p.EmEstoque);
+        printf("Preco: ");
+        scanf("%lf", &p.preco);
 
-        printf("Telefone\n");
-        printf("DDD: ");
-        scanf("%d", &c.telefone.ddd);
-        fflush(stdin);
-        printf("Telefone: ");
-        gets(c.telefone.telefone);
-
-        printf("Endereco\n");
-        printf("Logradouro: ");
-        gets(c.endereco.logradouro);
-        printf("Endereco: ");
-        gets(c.endereco.endereco);
-        fflush(stdin);
-        printf("Numero da casa/apt: ");
-        scanf("%d", &c.endereco.casa);
-        fflush(stdin);
-        printf("Cidade: ");
-        gets(c.endereco.cidade);
-        printf("Estado: ");
-        gets(c.endereco.estado);
-        printf("Pais: ");
-        gets(c.endereco.pais);
-
-        adicionar_cliente(lista, c);
+        adicionar_produto(lista, p);
 
         char cancontinue;
-        printf("Continuar? (S/N): ");
         fflush(stdin);
+        printf("Continuar? (S/N): ");
         scanf("%c", &cancontinue);
-
         if (cancontinue == 'N')
             break;
     }
 }
 
-void lendo(Clientes *lista){
+void lendo(Produtos *lista){
     int i;
     printf("Tam: %d\n", lista->tamanho);
     for (i = 0; i < lista->tamanho; i++){
-        printf("***** CLIENTE *****\n");
-        printf("Nome: %s\n", lista->clientes[i].nome);
-        printf("Telefone: %d %s\n", lista->clientes[i].telefone.ddd, lista->clientes[i].telefone.telefone);
-        printf("Endereco: %s %s - %d, %s, %s, %s\n", lista->clientes[i].endereco.logradouro, lista->clientes[i].endereco.endereco, lista->clientes[i].endereco.casa, lista->clientes[i].endereco.cidade, lista->clientes[i].endereco.estado, lista->clientes[i].endereco.pais);
+        printf("***** PRODUTO *****\n");
+        printf("Nome: %s\n", lista->produtos[i].nome);
+        printf("Em estoque: %d\n", lista->produtos[i].EmEstoque);
+        printf("Preco: %lf\n", lista->produtos[i].preco);
     }
 }
 
-void buscando(Clientes *lista){
+void buscando(Produtos *lista){
     printf("***** BUSCAR *****\n");
     printf("Pesquisar: ");
     
@@ -87,14 +67,14 @@ void buscando(Clientes *lista){
     fflush(stdin);
     gets(termo);
 
-    struct cliente **resultados = buscar_cliente(lista, termo, &ocorrencias);
+    struct produto **resultados = buscar_produto(lista, termo, &ocorrencias);
 
     printf("Encontramos %d resultados.\n", ocorrencias);
     int i;
     for (i = 0; i < ocorrencias; i++){
-        printf("***** CLIENTE *****\n");
+        printf("***** PRODUTO *****\n");
         printf("Nome: %s\n", resultados[i]->nome);
-        printf("Telefone: %d %s\n", resultados[i]->telefone.ddd, resultados[i]->telefone.telefone);
-        printf("Endereco: %s %s - %d, %s, %s, %s\n", resultados[i]->endereco.logradouro, resultados[i]->endereco.endereco, resultados[i]->endereco.casa, resultados[i]->endereco.cidade, resultados[i]->endereco.estado, resultados[i]->endereco.pais);
+        printf("Em estoque: %d\n", resultados[i]->EmEstoque);
+        printf("Preco: %lf\n", resultados[i]->preco);    
     }
 }

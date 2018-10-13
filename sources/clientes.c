@@ -110,8 +110,6 @@ struct cliente **buscar_cliente(Clientes *lista, char *termo, int *ocorrencias){
     *ocorrencias = 0;
 
     while (strstr((termo1 = palavra_para_palavra_minuscula(lista->clientes[pos].nome)), (termo2 = palavra_para_palavra_minuscula(termo))) != NULL){
-        printf("-> %s\n", termo1);
-        
         resultados[(*ocorrencias)++] = &(lista->clientes[pos++]);
         resultados = (struct cliente **) realloc(resultados, (*ocorrencias + 1) * sizeof(struct cliente *));
 

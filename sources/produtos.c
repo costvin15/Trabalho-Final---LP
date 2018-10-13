@@ -34,8 +34,8 @@ void popular_produtos(Produtos *lista){
 
     for (; quantidade > 0; quantidade--){
         fscanf(dados, "%[^\n]%*c", &p.nome);
-        fscanf(dados, "%d", &p.EmEstoque);
-        fscanf(dados, "%lf", &p.preco);
+        fscanf(dados, "%d ", &p.EmEstoque);
+        fscanf(dados, "%lf ", &p.preco);
         adicionar_produto(lista, p);
     }
 }
@@ -55,55 +55,52 @@ void salvar_produtos(Produtos *lista){
 }
 
 static int BuscaBinaria(Produtos *lista, char *termo, int inicio, int fim){
-    int meio = (inicio + fim) / 2;
+    int retorno, meio = (inicio + fim) / 2;
+    
+    char *palavra1, *palavra2;
+    palavra1 = palavra_para_palavra_minuscula(lista->produtos[meio].nome);
+    palavra2 = palavra_para_palavra_minuscula(termo);
 
-    if (strcmp(palavra_para_palavra_minuscula(lista->produtos[meio].nome), termo) == 0)
-        return meio;
-    if (inicio > fim)
-        return inicio;
+    if (strcmp(palavra1, palavra2) == 0)
+        retorno = meio;
     else
-        if (strcmp(termo, palavra_para_palavra_minuscula(lista->produtos[meio].nome)) > 0)
-            return BuscaBinaria(lista, termo, meio + 1, fim);
+        if (inicio > fim)
+            retorno = inicio;
         else
-            return BuscaBinaria(lista, termo, inicio, meio - 1);
+            if (strcmp(palavra1, palavra2) > 0)
+                retorno = BuscaBinaria(lista, termo, inicio, meio - 1);
+            else
+                retorno = BuscaBinaria(lista, termo, meio + 1, fim);
+    
+    free(palavra1);
+    free(palavra2);
+    return retorno;
 }
 
 void adicionar_produto(Produtos *lista, struct produto novo_produto){
-    //lista->produtos = (struct produto *) realloc(lista->produtos, (lista->tamanho + 1) * sizeof(struct produto));
-    
+    lista->produtos = (struct produto *) realloc(lista->produtos, (lista->tamanho + 1) * sizeof(struct produto));
+    int i, pos = BuscaBinaria(lista, novo_produto.nome, 0, lista->tamanho - 1);
+
+    for (i = lista->tamanho - 1; i >= pos; i--)
+        lista->produtos[i + 1] = lista->produtos[i];
+    lista->produtos[pos] = novo_produto;
     lista->tamanho++;
-    lista->produtos = (struct produto *) realloc(lista->produtos, lista->tamanho * sizeof(struct produto));
-    lista->produtos[lista->tamanho - 1] = novo_produto;
-
-    int i, j;
-    char *p1, *p2;
-    for (i = 0; i < lista->tamanho - 1; i++)
-        for (j = i + 1; j < lista->tamanho; j++){
-            p1 = palavra_para_palavra_minuscula(lista->produtos[i].nome);
-            p2 = palavra_para_palavra_minuscula(lista->produtos[j].nome);
-
-            if (strcmp(p1, p2) > 0){
-                struct produto aux;
-                aux = lista->produtos[i];
-                lista->produtos[i] = lista->produtos[j];
-                lista->produtos[j] = aux;
-            }
-
-            free(p1);
-            free(p2);
-        }
 }
 
-struct produto **busca(Produtos *lista, char *produto, int *quantidade){
-    int resultado = BuscaBinaria(lista, palavra_para_palavra_minuscula(produto), 0, lista->tamanho - 1);
+struct produto **buscar_produto(Produtos *lista, char *termo, int *ocorrencias){
+    int pos = BuscaBinaria(lista, termo, 0, lista->tamanho - 1);
+    struct produto **resultados = (struct produto **) malloc(sizeof(struct produto *));
+    char *termo1, *termo2;
 
-    *quantidade = 0;
-    struct produto **vetor = (struct produto **) malloc(sizeof(struct produto *));
+    *ocorrencias = 0;
 
-    while (strstr(palavra_para_palavra_minuscula(lista->produtos[resultado].nome), palavra_para_palavra_minuscula(produto)) != NULL){
-        vetor[(*quantidade)++] = &(lista->produtos[resultado++]);
-        vetor = (struct produto **) realloc(vetor, (*quantidade + 1) * sizeof(struct produto *));
+    while (strstr((termo1 = palavra_para_palavra_minuscula(lista->produtos[pos].nome)), (termo2 = palavra_para_palavra_minuscula(termo))) != NULL){
+        resultados[(*ocorrencias)++] = &(lista->produtos[pos++]);
+        resultados = (struct produto **) realloc(resultados, (*ocorrencias + 1) * sizeof(struct produto *));
+
+        free(termo1);
+        free(termo2);
     }
 
-    return vetor;
+    return resultados;
 }
