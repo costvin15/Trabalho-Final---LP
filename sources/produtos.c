@@ -30,10 +30,10 @@ void popular_produtos(Produtos *lista){
     if (dados == NULL)
         return;
     
-    fscanf(dados, "%d", &quantidade);
+    fscanf(dados, "%d ", &quantidade);
 
     for (; quantidade > 0; quantidade--){
-        fscanf(dados, "%s", p.nome);
+        fscanf(dados, "%[^\n]%*c", &p.nome);
         fscanf(dados, "%d", &p.EmEstoque);
         fscanf(dados, "%lf", &p.preco);
         adicionar_produto(lista, p);
