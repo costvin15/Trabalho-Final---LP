@@ -28,6 +28,7 @@ struct telefone {
 };
 
 struct cliente {
+    unsigned int id;
     char nome[100];
     struct telefone telefone;
     struct endereco endereco;
