@@ -69,7 +69,7 @@ void salvar_clientes(Clientes *lista){
     }
 }
 
-static int BuscaBinaria(Clientes *lista, char *termo, int inicio, int fim){
+static int BuscaBinaria(Clientes *lista, char *termo, int inicio, int fim, int tipo){
     int retorno, meio = (inicio + fim) / 2;
     
     char *palavra1, *palavra2;
@@ -80,12 +80,15 @@ static int BuscaBinaria(Clientes *lista, char *termo, int inicio, int fim){
         retorno = meio;
     else
         if (inicio > fim)
-            retorno = inicio;
+            if (tipo == 1)
+                retorno = inicio;
+            else
+                retorno = -1;
         else
             if (strcmp(palavra1, palavra2) > 0)
-                retorno = BuscaBinaria(lista, termo, inicio, meio - 1);
+                retorno = BuscaBinaria(lista, termo, inicio, meio - 1, tipo);
             else
-                retorno = BuscaBinaria(lista, termo, meio + 1, fim);
+                retorno = BuscaBinaria(lista, termo, meio + 1, fim, tipo);
     
     free(palavra1);
     free(palavra2);
@@ -94,7 +97,7 @@ static int BuscaBinaria(Clientes *lista, char *termo, int inicio, int fim){
 
 void adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
     lista->clientes = (struct cliente *) realloc(lista->clientes, (lista->tamanho + 1) * sizeof(struct cliente));
-    int i, pos = BuscaBinaria(lista, novo_cliente.nome, 0, lista->tamanho - 1);
+    int i, pos = BuscaBinaria(lista, novo_cliente.nome, 0, lista->tamanho - 1, 1);
 
     for (i = lista->tamanho - 1; i >= pos; i--)
         lista->clientes[i + 1] = lista->clientes[i];
@@ -102,8 +105,27 @@ void adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
     lista->tamanho++;
 }
 
+int remover_cliente(Clientes *lista, char *nome, int tipo){
+    char escolha;
+    int i, pos = BuscaBinaria(lista, nome, 0, lista->tamanho - 1, tipo);
+
+    if (pos == -1)
+        return pos;
+
+    for (i = pos; i < lista->tamanho; i++)
+        lista->clientes[i] = lista->clientes[i + 1];
+    lista->tamanho--;
+
+    return pos;
+}
+
+struct cliente *buscar_simples_cliente(Clientes *lista, char *termo){
+    int pos = BuscaBinaria(lista, termo, 0, lista->tamanho - 1, 1);
+    return &lista->clientes[pos];
+}
+
 struct cliente **buscar_cliente(Clientes *lista, char *termo, int *ocorrencias){
-    int pos = BuscaBinaria(lista, termo, 0, lista->tamanho - 1);
+    int pos = BuscaBinaria(lista, termo, 0, lista->tamanho - 1, 1);
     struct cliente **resultados = (struct cliente **) malloc(sizeof(struct cliente *));
     char *termo1, *termo2;
 

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct endereco {
     char logradouro[20];
@@ -45,6 +46,9 @@ void popular_clientes(Clientes *);
 void salvar_clientes(Clientes *);
 
 void adicionar_cliente(Clientes *, struct cliente);
+int remover_cliente(Clientes *, char *, int);
+
+struct cliente *buscar_simples_cliente(Clientes *, char *);
 struct cliente **buscar_cliente(Clientes *, char *, int *);
 
 #endif
