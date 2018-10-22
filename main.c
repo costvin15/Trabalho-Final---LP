@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include "headers/clientes.h"
+#include "headers/produtos.h"
 
 int main(int argc, char **argv){
     gtk_init(&argc, &argv);
@@ -33,8 +34,13 @@ int main(int argc, char **argv){
     tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "tree_view_produtos"));
     store = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
 
-    gtk_list_store_append(store, &iter);
-    gtk_list_store_set(store, &iter, 0, "Refrigerante Xingu", 1, 10, 2, 5.50, -1);
+    Produtos *listaProdutos = criar_produtos();
+    popular_produtos(listaProdutos);
+
+    for (i = 0; i < listaProdutos->tamanho; i++){
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, 0, listaProdutos->produtos[i].nome, 1, listaProdutos->produtos[i].EmEstoque, 2, listaProdutos->produtos[i].preco, -1);
+    }
 
     g_object_unref(G_OBJECT(builder));
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
