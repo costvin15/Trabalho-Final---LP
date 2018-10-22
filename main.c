@@ -1,9 +1,55 @@
 #include <gtk/gtk.h>
 #include "headers/clientes.h"
 
+int main(int argc, char **argv){
+    gtk_init(&argc, &argv);
+
+    GtkBuilder *builder = gtk_builder_new();
+    GError *error = NULL;
+    if (gtk_builder_add_from_file(builder, "interfaces/main.ui", &error) == 0){
+        return 1;
+    }
+    
+    GtkWidget *mainWindow = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
+    GtkTreeView *tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "tree_view_clientes"));
+    GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
+    GtkTreeIter iter;
+
+    int i;
+    Clientes *listaClientes = criar_clientes();
+    popular_clientes(listaClientes);
+
+    for (i = 0; i < listaClientes->tamanho; i++){
+        char telefone[50];
+        char endereco[175];
+
+        sprintf(telefone, "(%u) %s", listaClientes->clientes[i].telefone.ddd, listaClientes->clientes[i].telefone.telefone);
+        sprintf(endereco, "%s %s - %u, %s - %s, %s", listaClientes->clientes[i].endereco.logradouro, listaClientes->clientes[i].endereco.endereco, listaClientes->clientes[i].endereco.casa, listaClientes->clientes[i].endereco.cidade, listaClientes->clientes[i].endereco.estado, listaClientes->clientes[i].endereco.pais);
+
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, 0, listaClientes->clientes[i].nome, 1, telefone, 2, endereco, -1);
+    }
+    
+    tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "tree_view_produtos"));
+    store = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
+
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter, 0, "Refrigerante Xingu", 1, 10, 2, 5.50, -1);
+
+    g_object_unref(G_OBJECT(builder));
+    g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_widget_show(mainWindow);
+    gtk_main();
+}
+
+/*#include <gtk/gtk.h>
+#include "headers/clientes.h"
+
 static void ativarAplicacao(GtkApplication *, gpointer);
 static void criarAbas(GtkContainer *);
 static GtkWidget *criarClientes();
+
+static void novoCliente();
 
 int main(int argc, char **argv){
     GtkApplication *app;
@@ -91,5 +137,35 @@ static GtkWidget *criarClientes(){
     gtk_tree_view_set_model(GTK_TREE_VIEW(listView), model);
 
     gtk_container_add(GTK_CONTAINER(box), listView);
+
+    GtkWidget *ActionBar;
+    ActionBar = gtk_action_bar_new();
+
+    GtkWidget *newItemButton;
+    newItemButton = gtk_button_new_from_icon_name("document-new", GTK_ICON_SIZE_SMALL_TOOLBAR);
+    gtk_widget_set_tooltip_text(newItemButton, "Novo Cliente");
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(ActionBar), newItemButton);
+    g_signal_connect(newItemButton, "clicked", G_CALLBACK(novoCliente), NULL);
+
+    GtkWidget *editItemButton;
+    editItemButton = gtk_button_new_from_icon_name("applications-office", GTK_ICON_SIZE_SMALL_TOOLBAR);
+    gtk_widget_set_tooltip_text(editItemButton, "Editar Cliente");
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(ActionBar), editItemButton);
+
+    GtkWidget *removeItemButton;
+    editItemButton = gtk_button_new_from_icon_name("edit-delete", GTK_ICON_SIZE_SMALL_TOOLBAR);
+    gtk_widget_set_tooltip_text(editItemButton, "Remover Cliente");
+    gtk_action_bar_pack_start(GTK_ACTION_BAR(ActionBar), editItemButton);
+
+    gtk_box_pack_end(GTK_BOX(box), ActionBar, FALSE, TRUE, 5);
+
     return box;
 }
+
+static void novoCliente(){
+    GtkWidget *popup = gtk_dialog_new_with_buttons("Novo Cliente", NULL, GTK_DIALOG_DESTROY_WITH_PARENT, "OK", GTK_RESPONSE_NONE, NULL);
+    GtkWidget *popup_content = gtk_dialog_get_content_area(GTK_DIALOG(popup));
+
+    g_signal_connect(popup, "response", G_CALLBACK(gtk_widget_destroy), popup);
+    gtk_widget_show_all(popup);
+}*/
