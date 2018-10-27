@@ -32,6 +32,7 @@ void popular_clientes(Clientes *lista){
     fscanf(dados, "%d ", &quantidade);
 
     for (; quantidade > 0; quantidade--){
+        fscanf(dados, "%u ", &c.id);
         fscanf(dados, "%[^\n]%*c", &c.nome);
         fscanf(dados, "%d ", &c.telefone.ddd);
         fscanf(dados, "%[^\n]%*c", &c.telefone.telefone);
@@ -58,6 +59,7 @@ void salvar_clientes(Clientes *lista){
 
     int i;
     for (i = 0; i < lista->tamanho; i++){
+        fprintf(dados, "%u\n", lista->clientes[i].id);
         fprintf(dados, "%s\n", lista->clientes[i].nome);
         fprintf(dados, "%d\n", lista->clientes[i].telefone.ddd);
         fprintf(dados, "%s\n", lista->clientes[i].telefone.telefone);
@@ -104,6 +106,7 @@ int adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
     for (i = lista->tamanho - 1; i >= pos; i--)
         lista->clientes[i + 1] = lista->clientes[i];
     lista->clientes[pos] = novo_cliente;
+    lista->clientes[pos].id = lista->tamanho;
     lista->tamanho++;
     return true;
 }

@@ -15,6 +15,7 @@
 #include <stdbool.h>
 
 struct produto {
+    unsigned int id;
     char nome[100];
     int EmEstoque;
     double preco;
