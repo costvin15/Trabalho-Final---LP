@@ -19,12 +19,14 @@
       <!-- column-name gint -->
       <column type="gint"/>
       <!-- column-name gfloat -->
-      <column type="gfloat"/>
+      <column type="gchararray"/>
     </columns>
   </object>
+
   <object class="GtkWindow" id="window">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
+    <property name="window_position">center</property>
     <property name="title">NerdZ</property>
     <property name="default_width">750</property>
     <property name="default_height">600</property>
@@ -90,8 +92,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="toolbuttonNovoCliente">
                     <property name="visible">True</property>
+                    <property name="tooltip-text">Novo Cliente</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
                     <property name="icon_name">document-new</property>
@@ -104,6 +107,7 @@
                 <child>
                   <object class="GtkToolButton">
                     <property name="visible">True</property>
+                    <property name="tooltip-text">Editar Cliente</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
                     <property name="icon_name">accessories-text-editor</property>
@@ -114,8 +118,9 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="toolbuttonApagarCliente">
                     <property name="visible">True</property>
+                    <property name="tooltip-text">Apagar Cliente</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
                     <property name="icon_name">edit-delete</property>
@@ -185,7 +190,6 @@
                       <object class="GtkCellRendererText"/>
                       <attributes>
                         <attribute name="text">2</attribute>
-                        <attribute name="max-width-chars">2</attribute>
                       </attributes>
                     </child>
                   </object>
@@ -202,7 +206,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="toolbuttonNovoProduto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
@@ -226,7 +230,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="remover_produto_button">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>

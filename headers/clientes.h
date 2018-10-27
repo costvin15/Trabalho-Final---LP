@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct endereco {
     char logradouro[20];
@@ -19,7 +20,6 @@ struct endereco {
     unsigned short casa;
     char cidade[50];
     char estado[25];
-    char pais[25];
 };
 
 struct telefone {
@@ -44,7 +44,8 @@ void apagar_clientes(Clientes *);
 void popular_clientes(Clientes *);
 void salvar_clientes(Clientes *);
 
-void adicionar_cliente(Clientes *, struct cliente);
+int adicionar_cliente(Clientes *, struct cliente);
+int remover_cliente(Clientes *, char *);
 struct cliente **buscar_cliente(Clientes *, char *, int *);
 
 #endif

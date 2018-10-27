@@ -1,177 +1,216 @@
-#include <gtk/gtk.h>
 #include "headers/clientes.h"
 #include "headers/produtos.h"
+#include <gtk/gtk.h>
+#include <stdlib.h>
+
+Clientes *InicializarClientes();
+Produtos *InicializarProdutos();
+void InicializarListaClientes(GtkWidget *, GtkBuilder *);
+void InicializarListaProdutos(GtkWidget *, GtkBuilder *);
+
+void NovoClientePopup(GtkWidget *, GtkBuilder *);
+void NovoClienteSubmit(GtkWidget *, GtkBuilder *);
+void ApagarClientePopup(GtkWidget *, GtkBuilder *);
+
+void NovoProdutoPopup(GtkWidget *, GtkBuilder *);
 
 int main(int argc, char **argv){
     gtk_init(&argc, &argv);
 
-    GtkBuilder *builder = gtk_builder_new();
+    Clientes *lista;
+    GtkBuilder *interface;
+    const gchar interfaceFilename[] = "interfaces/main.ui";
+    GtkWidget *window, *toolbuttonNovoCliente, *toolbuttonNovoProduto, *toolbuttonApagarCliente;
     GError *error = NULL;
-    if (gtk_builder_add_from_file(builder, "interfaces/main.ui", &error) == 0){
-        return 1;
+
+    interface = gtk_builder_new();
+    if (!gtk_builder_add_from_file(interface, interfaceFilename, &error)){
+        printf("Ocorreu um erro: Nao foi possivel inicial a GUI. Erro: %s\n", error->message);
+        exit(1);
     }
+
+    InicializarListaClientes(NULL, interface);
+    InicializarListaProdutos(NULL, interface);
+
+    window = GTK_WIDGET(gtk_builder_get_object(interface, "window"));
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     
-    GtkWidget *mainWindow = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
-    GtkTreeView *tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "tree_view_clientes"));
-    GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
-    GtkTreeIter iter;
+    toolbuttonNovoCliente = GTK_WIDGET(gtk_builder_get_object(interface, "toolbuttonNovoCliente"));
+    g_signal_connect(toolbuttonNovoCliente, "clicked", G_CALLBACK(NovoClientePopup), interface);
 
-    int i;
-    Clientes *listaClientes = criar_clientes();
-    popular_clientes(listaClientes);
+    toolbuttonApagarCliente = GTK_WIDGET(gtk_builder_get_object(interface, "toolbuttonApagarCliente"));
+    g_signal_connect(toolbuttonApagarCliente, "clicked", G_CALLBACK(ApagarClientePopup), interface);
 
-    for (i = 0; i < listaClientes->tamanho; i++){
-        char telefone[50];
-        char endereco[175];
+    toolbuttonNovoProduto = GTK_WIDGET(gtk_builder_get_object(interface, "toolbuttonNovoProduto"));
+    g_signal_connect(toolbuttonNovoProduto, "clicked", G_CALLBACK(NovoProdutoPopup), interface);
 
-        sprintf(telefone, "(%u) %s", listaClientes->clientes[i].telefone.ddd, listaClientes->clientes[i].telefone.telefone);
-        sprintf(endereco, "%s %s - %u, %s - %s, %s", listaClientes->clientes[i].endereco.logradouro, listaClientes->clientes[i].endereco.endereco, listaClientes->clientes[i].endereco.casa, listaClientes->clientes[i].endereco.cidade, listaClientes->clientes[i].endereco.estado, listaClientes->clientes[i].endereco.pais);
-
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, listaClientes->clientes[i].nome, 1, telefone, 2, endereco, -1);
-    }
-    
-    tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "tree_view_produtos"));
-    store = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
-
-    Produtos *listaProdutos = criar_produtos();
-    popular_produtos(listaProdutos);
-
-    for (i = 0; i < listaProdutos->tamanho; i++){
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, listaProdutos->produtos[i].nome, 1, listaProdutos->produtos[i].EmEstoque, 2, listaProdutos->produtos[i].preco, -1);
-    }
-
-    g_object_unref(G_OBJECT(builder));
-    g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_widget_show(mainWindow);
     gtk_main();
+
+    lista = InicializarClientes();
+    salvar_clientes(lista);
 }
 
-/*#include <gtk/gtk.h>
-#include "headers/clientes.h"
-
-static void ativarAplicacao(GtkApplication *, gpointer);
-static void criarAbas(GtkContainer *);
-static GtkWidget *criarClientes();
-
-static void novoCliente();
-
-int main(int argc, char **argv){
-    GtkApplication *app;
-    int status;
-
-    app = gtk_application_new("com.viniciuscosta.trabalhofinal", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect(app, "activate", G_CALLBACK(ativarAplicacao), NULL);
-    status = g_application_run(G_APPLICATION(app), argc, argv);
-    g_object_unref(app);
-
-    return status;
+Clientes *InicializarClientes(){
+    static Clientes *lista = NULL;
+    if (!lista){
+        lista = criar_clientes();
+        popular_clientes(lista);
+    }
+    return (Clientes *) lista;
 }
 
-static void ativarAplicacao(GtkApplication *app, gpointer user_data){
-    GtkWidget *janela;
-    janela = gtk_application_window_new(app);
-    gtk_window_set_default_size(GTK_WINDOW(janela), 750, 600);
-
-    GtkWidget *cabecalho;
-    cabecalho = gtk_header_bar_new();
-    gtk_header_bar_set_title(GTK_HEADER_BAR(cabecalho), "NerdZ");
-    gtk_header_bar_set_subtitle(GTK_HEADER_BAR(cabecalho), "Sistema de Loja");
-    gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(cabecalho), TRUE);
-    gtk_window_set_titlebar(GTK_WINDOW(janela), cabecalho);
-
-    criarAbas(GTK_CONTAINER(janela));
-
-    gtk_widget_show_all(GTK_WIDGET(janela));
-}
-
-static void criarAbas(GtkContainer *container){
-    GtkWidget *abas;
-    abas = gtk_notebook_new();
-    gtk_notebook_set_scrollable(GTK_NOTEBOOK(abas), TRUE);
-
-    GtkWidget *clientesLabel;
-    clientesLabel = gtk_label_new("Clientes");
-    gtk_notebook_append_page(GTK_NOTEBOOK(abas), criarClientes(), clientesLabel);
-
-    
-    GtkWidget *produtosLabel;
-    produtosLabel = gtk_label_new("Produtos");
-    gtk_notebook_append_page(GTK_NOTEBOOK(abas), criarClientes(), produtosLabel);
-
-    gtk_container_add(container, abas);
-}
-
-static GtkWidget *criarClientes(){
-    Clientes *c;
-    c = criar_clientes();
-    popular_clientes(c);
-
-    GtkWidget *box;
-    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-
-    GtkWidget *listView;
-    listView = gtk_tree_view_new();
-    GtkCellRenderer *renderer;
-    renderer = gtk_cell_renderer_text_new();
-
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(listView), -1, "Nome", renderer, "text", 0, NULL);
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(listView), -1, "Telefone", renderer, "text", 1, NULL);
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(listView), -1, "Endereço", renderer, "text", 2, NULL);
-
-    GtkListStore *store;
-    GtkTreeIter iter;
-
-    store = gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-
-    int i;
-    for (i = 0; i < c->tamanho; i++){
-        char telefone[50];
-        char endereco[175];
-
-        sprintf(telefone, "(%u) %s", c->clientes[i].telefone.ddd, c->clientes[i].telefone.telefone);
-        sprintf(endereco, "%s %s - %u, %s - %s, %s", c->clientes[i].endereco.logradouro, c->clientes[i].endereco.endereco, c->clientes[i].endereco.casa, c->clientes[i].endereco.cidade, c->clientes[i].endereco.estado, c->clientes[i].endereco.pais);
-
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, c->clientes[i].nome, 1, telefone, 2, endereco, -1);
+Produtos *InicializarProdutos(){
+    static Produtos *lista = NULL;
+    if (!lista){
+        lista = criar_produtos();
+        popular_produtos(lista);
     }
 
-    GtkTreeModel *model;
-    model = GTK_TREE_MODEL(store);
-    
-    gtk_tree_view_set_model(GTK_TREE_VIEW(listView), model);
-
-    gtk_container_add(GTK_CONTAINER(box), listView);
-
-    GtkWidget *ActionBar;
-    ActionBar = gtk_action_bar_new();
-
-    GtkWidget *newItemButton;
-    newItemButton = gtk_button_new_from_icon_name("document-new", GTK_ICON_SIZE_SMALL_TOOLBAR);
-    gtk_widget_set_tooltip_text(newItemButton, "Novo Cliente");
-    gtk_action_bar_pack_start(GTK_ACTION_BAR(ActionBar), newItemButton);
-    g_signal_connect(newItemButton, "clicked", G_CALLBACK(novoCliente), NULL);
-
-    GtkWidget *editItemButton;
-    editItemButton = gtk_button_new_from_icon_name("applications-office", GTK_ICON_SIZE_SMALL_TOOLBAR);
-    gtk_widget_set_tooltip_text(editItemButton, "Editar Cliente");
-    gtk_action_bar_pack_start(GTK_ACTION_BAR(ActionBar), editItemButton);
-
-    GtkWidget *removeItemButton;
-    editItemButton = gtk_button_new_from_icon_name("edit-delete", GTK_ICON_SIZE_SMALL_TOOLBAR);
-    gtk_widget_set_tooltip_text(editItemButton, "Remover Cliente");
-    gtk_action_bar_pack_start(GTK_ACTION_BAR(ActionBar), editItemButton);
-
-    gtk_box_pack_end(GTK_BOX(box), ActionBar, FALSE, TRUE, 5);
-
-    return box;
+    return (Produtos *) lista;
 }
 
-static void novoCliente(){
-    GtkWidget *popup = gtk_dialog_new_with_buttons("Novo Cliente", NULL, GTK_DIALOG_DESTROY_WITH_PARENT, "OK", GTK_RESPONSE_NONE, NULL);
-    GtkWidget *popup_content = gtk_dialog_get_content_area(GTK_DIALOG(popup));
+void InicializarListaClientes(GtkWidget *caller, GtkBuilder *interface){
+    Clientes *lista = InicializarClientes();
+    GtkTreeView *arvore = GTK_TREE_VIEW(gtk_builder_get_object(interface, "tree_view_clientes"));
+    GtkListStore *arvoreDados = GTK_LIST_STORE(gtk_tree_view_get_model(arvore));    
+    GtkTreeIter iterador;
+    char telefone[50], endereco[175];
+    int i;
 
-    g_signal_connect(popup, "response", G_CALLBACK(gtk_widget_destroy), popup);
-    gtk_widget_show_all(popup);
-}*/
+    gtk_list_store_clear(arvoreDados);
+    
+    for (i = 0; i < lista->tamanho; i++){
+        sprintf(telefone, "(%u) %s", lista->clientes[i].telefone.ddd, lista->clientes[i].telefone.telefone);
+        sprintf(endereco, "%s %s - %u, %s - %s", lista->clientes[i].endereco.logradouro, lista->clientes[i].endereco.endereco, lista->clientes[i].endereco.casa, lista->clientes[i].endereco.cidade, lista->clientes[i].endereco.estado);
+
+        gtk_list_store_append((GtkListStore *) arvoreDados, &iterador);
+        gtk_list_store_set((GtkListStore *) arvoreDados, &iterador, 0, lista->clientes[i].nome, 1, telefone, 2, endereco, -1);
+    }
+}
+
+void InicializarListaProdutos(GtkWidget *caller, GtkBuilder *interface){
+    Produtos *lista = InicializarProdutos();
+    GtkTreeView *arvore = GTK_TREE_VIEW(gtk_builder_get_object(interface, "tree_view_produtos"));
+    GtkListStore *arvoreDados = GTK_LIST_STORE(gtk_tree_view_get_model(arvore));
+    GtkTreeIter iterador;
+    char preco[15];
+    int i;
+
+    gtk_list_store_clear(arvoreDados);
+    for (i = 0; i < lista->tamanho; i++){
+        sprintf(preco, "R$ %.2f", lista->produtos[i].preco);
+
+        gtk_list_store_append((GtkListStore *) arvoreDados, &iterador);
+        gtk_list_store_set((GtkListStore *) arvoreDados, &iterador, 0, lista->produtos[i].nome, 1, lista->produtos[i].EmEstoque, 2, preco, -1);
+    }
+}
+
+void NovoClientePopup(GtkWidget *caller, GtkBuilder *mainInterface){
+    GtkBuilder *interface;
+    const gchar interfaceFilename[] = "interfaces/novocliente.ui";
+    GtkWidget *window, *inputSubmit;
+    Clientes *lista = InicializarClientes();
+
+    interface = gtk_builder_new();
+    if (!gtk_builder_add_from_file(interface, interfaceFilename, NULL)){
+        printf("Ocorreu um erro: Nao foi possivel inicial a GUI.\n");
+        exit(1);
+    }
+
+    window = GTK_WIDGET(gtk_builder_get_object(interface, "dialog"));
+    inputSubmit = GTK_WIDGET(gtk_builder_get_object(interface, "inputSubmit"));
+    g_signal_connect(inputSubmit, "clicked", G_CALLBACK(NovoClienteSubmit), interface);
+    g_signal_connect(window, "destroy", G_CALLBACK(InicializarListaClientes), mainInterface);
+
+    gtk_widget_show(window);
+}
+
+void NovoClienteSubmit(GtkWidget *caller, GtkBuilder *interface){
+    struct cliente novo_cliente;
+    Clientes *lista = InicializarClientes();
+    GtkWidget *window, *dialogMessageResult, *inputNome, *inputDDD, *inputTelefone, *inputLogradouro, *inputEndereco, *inputNumero, *inputCidade, *inputEstado;
+    
+    inputNome = GTK_WIDGET(gtk_builder_get_object(interface, "inputNome"));
+    inputDDD = GTK_WIDGET(gtk_builder_get_object(interface, "inputDDD"));
+    inputTelefone = GTK_WIDGET(gtk_builder_get_object(interface, "inputTelefone"));
+    inputLogradouro = GTK_WIDGET(gtk_builder_get_object(interface, "inputLogradouro"));
+    inputEndereco = GTK_WIDGET(gtk_builder_get_object(interface, "inputEndereco"));
+    inputNumero = GTK_WIDGET(gtk_builder_get_object(interface, "inputNumero"));
+    inputCidade = GTK_WIDGET(gtk_builder_get_object(interface, "inputCidade"));
+    inputEstado = GTK_WIDGET(gtk_builder_get_object(interface, "inputEstado"));
+
+    sprintf(novo_cliente.nome, "%s", gtk_entry_get_text(GTK_ENTRY(inputNome)));
+    novo_cliente.telefone.ddd = gtk_spin_button_get_value(GTK_SPIN_BUTTON(inputDDD));
+    sprintf(novo_cliente.telefone.telefone, "%s", gtk_entry_get_text(GTK_ENTRY(inputTelefone)));
+    sprintf(novo_cliente.endereco.logradouro, "%s", gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(inputLogradouro)));
+    sprintf(novo_cliente.endereco.endereco, "%s", gtk_entry_get_text(GTK_ENTRY(inputEndereco)));
+    novo_cliente.endereco.casa = gtk_spin_button_get_value(GTK_SPIN_BUTTON(inputNumero));
+    sprintf(novo_cliente.endereco.cidade, "%s", gtk_entry_get_text(GTK_ENTRY(inputCidade)));
+    sprintf(novo_cliente.endereco.estado, "%s", gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(inputEstado)));
+    
+    if (strlen(novo_cliente.nome) < 1 || strlen(novo_cliente.telefone.telefone) < 1 || strlen(novo_cliente.endereco.logradouro) < 1 || strlen(novo_cliente.endereco.endereco) < 1 || strlen(novo_cliente.endereco.cidade) < 1 || strlen(novo_cliente.endereco.estado) < 1){
+        dialogMessageResult = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Não é permitido campos em branco.");
+        gtk_dialog_run(GTK_DIALOG(dialogMessageResult));
+        gtk_widget_destroy(dialogMessageResult);
+    } else
+        if(!adicionar_cliente(lista, novo_cliente)){
+            dialogMessageResult = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "Já existe um cliente cadastrado com este nome.");
+            gtk_dialog_run(GTK_DIALOG(dialogMessageResult));
+            gtk_widget_destroy(dialogMessageResult);
+        } else {
+            window = GTK_WIDGET(gtk_builder_get_object(interface, "dialog"));
+            gtk_widget_destroy(window);
+        }
+}
+
+void ApagarClientePopup(GtkWidget *caller, GtkBuilder *interface){
+    GtkTreeIter *iter;
+    GtkTreeView *list;
+    GtkTreeModel *model;
+    GtkTreeSelection *selection;
+    Clientes *lista;
+    GtkWidget *dialog;
+    int result;
+    
+    lista = InicializarClientes();
+    list = GTK_TREE_VIEW(gtk_builder_get_object(interface, "tree_view_clientes"));
+    selection = gtk_tree_view_get_selection(list);
+    if(!gtk_tree_selection_get_selected(selection, &model, iter))
+        return;
+    
+    gchar *clienteNome;
+    gtk_tree_model_get(model, iter, 0, &clienteNome, -1);
+    
+    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, "Apagar cliente?");
+    result = gtk_dialog_run(GTK_DIALOG(dialog));
+    
+    switch (result){
+        case GTK_RESPONSE_YES:        
+            remover_cliente(lista, clienteNome);
+            InicializarListaClientes(NULL, interface);
+            break;
+        case GTK_RESPONSE_NO:
+            printf("No\n");
+            break;
+        default:
+            printf("Unknow\n");
+            break;
+    }
+    gtk_widget_destroy(dialog);
+}
+
+void NovoProdutoPopup(GtkWidget *caller, GtkBuilder *mainInterface){
+    GtkBuilder *interface;
+    const gchar interfaceFilename[] = "interfaces/novoproduto.ui";
+    GtkWidget *window, *inputSubmit;
+
+    interface = gtk_builder_new();
+    if(!gtk_builder_add_from_file(interface, interfaceFilename, NULL)){
+        printf("Ocorreu um erro: Nao foi possivel inicial a GUI.\n");
+        exit(1);
+    }
+    
+    window = GTK_WIDGET(gtk_builder_get_object(interface, "dialog"));
+
+    gtk_widget_show(window);
+}
