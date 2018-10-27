@@ -33,7 +33,6 @@ void popular_produtos(Produtos *lista){
     fscanf(dados, "%d ", &quantidade);
 
     for (; quantidade > 0; quantidade--){
-        fscanf(dados, "%d ", &p.id);
         fscanf(dados, "%[^\n]%*c", &p.nome);
         fscanf(dados, "%d ", &p.EmEstoque);
         fscanf(dados, "%lf ", &p.preco);
@@ -49,7 +48,6 @@ void salvar_produtos(Produtos *lista){
     fprintf(dados, "%d\n", lista->tamanho);
     int i;
     for (i = 0; i < lista->tamanho; i++){
-        fprintf(dados, "%d\n", lista->produtos[i].id);
         fprintf(dados, "%s\n", lista->produtos[i].nome);
         fprintf(dados, "%d\n", lista->produtos[i].EmEstoque);
         fprintf(dados, "%lf\n", lista->produtos[i].preco);
@@ -86,7 +84,6 @@ void adicionar_produto(Produtos *lista, struct produto novo_produto){
     for (i = lista->tamanho - 1; i >= pos; i--)
         lista->produtos[i + 1] = lista->produtos[i];
     lista->produtos[pos] = novo_produto;
-    lista->produtos[pos].id = lista->tamanho;
     lista->tamanho++;
 }
 
