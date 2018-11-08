@@ -12,22 +12,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct endereco {
     char logradouro[20];
     char endereco[50];
     unsigned short casa;
+    char bairro[50];
     char cidade[50];
     char estado[25];
-    char pais[25];
 };
 
 struct telefone {
     unsigned short ddd;
-    char telefone[12];
+    char telefone[20];
 };
 
 struct cliente {
+    int index;
     char nome[100];
     struct telefone telefone;
     struct endereco endereco;
@@ -38,13 +40,15 @@ typedef struct {
     struct cliente *clientes;
 } Clientes;
 
+Clientes *reutilizar_clientes();
 Clientes *criar_clientes();
 void apagar_clientes(Clientes *);
 
 void popular_clientes(Clientes *);
 void salvar_clientes(Clientes *);
 
-void adicionar_cliente(Clientes *, struct cliente);
+int adicionar_cliente(Clientes *, struct cliente);
+int modificar_cliente(Clientes *, int, struct cliente *);
 struct cliente **buscar_cliente(Clientes *, char *, int *);
 
 #endif
