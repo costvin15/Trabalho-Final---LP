@@ -1,10 +1,19 @@
 //  ;=====================================
 //  ;  Title: produtos.c
 //  ;  Author: Vinicius Costa Castro
-//  ;  Date: 10/13/18
+//  ;  Date: 13/10/18
 //  ;=====================================
 
 #include "../headers/produtos.h"
+
+Produtos *reutilizar_produtos(){
+    static Produtos *lista = NULL;
+    if (lista)
+        return lista;
+    lista = criar_produtos();
+    popular_produtos(lista);
+    return lista;
+}
 
 Produtos *criar_produtos(){
     Produtos *nova_lista = (Produtos *) malloc(sizeof(Produtos));
@@ -77,14 +86,35 @@ static int BuscaBinaria(Produtos *lista, char *termo, int inicio, int fim){
     return retorno;
 }
 
-void adicionar_produto(Produtos *lista, struct produto novo_produto){
+int adicionar_produto(Produtos *lista, struct produto novo_produto){
     lista->produtos = (struct produto *) realloc(lista->produtos, (lista->tamanho + 1) * sizeof(struct produto));
     int i, pos = BuscaBinaria(lista, novo_produto.nome, 0, lista->tamanho - 1);
 
-    for (i = lista->tamanho - 1; i >= pos; i--)
+    if (strcmp(lista->produtos[pos].nome, novo_produto.nome) == 0)
+        return false;
+    
+
+    for (i = lista->tamanho - 1; i >= pos; i--){
+        lista->produtos[i].index = i + 1;
         lista->produtos[i + 1] = lista->produtos[i];
+    }    
+    
+    novo_produto.index = pos;
     lista->produtos[pos] = novo_produto;
     lista->tamanho++;
+    return true;
+}
+
+int remover_produto(Produtos *lista, int index){
+    for (; index < lista->tamanho; index++)
+        lista->produtos[index] = lista->produtos[index + 1];
+    lista->produtos = (struct produto *) realloc(lista->produtos, --(lista->tamanho) * sizeof(struct produto));
+    return true;
+}
+
+int modificar_produto(Produtos *lista, int index, struct produto *produto){
+    lista->produtos[index] = *produto;
+    return true;
 }
 
 struct produto **buscar_produto(Produtos *lista, char *termo, int *ocorrencias){

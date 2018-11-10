@@ -1,4 +1,11 @@
+//  ;=====================================
+//  ;  Title: clientes.c
+//  ;  Author: Vinicius Costa Castro
+//  ;  Date: 09/11/18
+//  ;=====================================
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <gtk/gtk.h>
 #include "headers/clientes.h"
@@ -11,8 +18,8 @@ static int dialogOpened = false;
 
 void clientes_gui(GtkBuilder *, Clientes *);
 void clientes_aba(GtkBuilder *, Clientes *);
-void recarregar_aba(GtkDialog *, GtkBuilder *);
-void mensagem_simples(GtkWindow *, gchar *, gchar *);
+void recarregar_aba_clientes(GtkDialog *, GtkBuilder *);
+void mensagem_simples_clientes(GtkWindow *, gchar *, gchar *);
 
 void clientes_botao(GtkBuilder *);
 
@@ -23,7 +30,7 @@ void editar_cliente_dialog(GtkWidget *, GtkBuilder *);
 void editar_cliente_callback(GtkWidget *, void**);
 
 void remover_cliente_dialog(GtkWidget *, GtkBuilder *);
-void remover_cliente_callback(GtkWidget *, int, struct cliente *);
+void remover_cliente_callback(GtkWidget *, int, int *);
 
 void clientes_gui(GtkBuilder *interface, Clientes *clientes){
     CLIENTES_LISTA = clientes;
@@ -35,8 +42,8 @@ void clientes_aba(GtkBuilder *interface, Clientes *clientes){
     GtkListStore *lista_estrutura;
     GtkTreeIter lista_estrutura_primaria;
 
-    lista = GTK_TREE_VIEW(gtk_builder_get_object(interface, "tree_view_clientes"));
-    lista_estrutura = GTK_LIST_STORE(gtk_tree_view_get_model(lista));
+    lista = (GtkTreeView *) gtk_builder_get_object(interface, "tree_view_clientes");
+    lista_estrutura = (GtkListStore *) gtk_tree_view_get_model(lista);
     
     gtk_list_store_clear(lista_estrutura);
 
@@ -55,19 +62,27 @@ void clientes_aba(GtkBuilder *interface, Clientes *clientes){
     clientes_botao(interface);
 }
 
-void recarregar_aba(GtkDialog *dialog, GtkBuilder *interface){
+void recarregar_aba_clientes(GtkDialog *dialog, GtkBuilder *interface){
     dialogOpened = false;
-    clientes_aba(interface, CLIENTES_LISTA);
+    if (interface)
+        clientes_aba(interface, CLIENTES_LISTA);
 }
 
-void mensagem_simples(GtkWindow *janela, gchar *titulo, gchar *mensagem){
+void mensagem_simples_clientes(GtkWindow *janela, gchar *titulo, gchar *mensagem){
     GtkWidget *dialog;
     GtkDialogFlags flags;
-    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
 
+    if (dialogOpened)
+        return;
+    else
+        dialogOpened = true;
+
+    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
     dialog = gtk_message_dialog_new(janela, flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, mensagem);
     gtk_window_set_title((GtkWindow *) dialog, titulo);
-    g_signal_connect_swapped(dialog, "response", G_CALLBACK(gtk_widget_destroy), dialog);
+    
+    g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), dialog);
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_clientes), NULL);
     gtk_widget_show_all(dialog);
 }
 
@@ -94,21 +109,23 @@ void novo_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     
     gtk_window_set_title((GtkWindow *) dialog, "Novo Cliente");
 
-    if (!window && !dialog && !submit)
+    if (!window || !dialog || !submit){
         fprintf(stderr, "Nao ha nenhum objeto com este id.\n");
-    else {
-        gtk_window_set_transient_for((GtkWindow *) dialog, (GtkWindow *) window);
-        gtk_widget_show(dialog);
+        return;
     }
 
+    gtk_window_set_transient_for((GtkWindow *) dialog, (GtkWindow *) window);
+    gtk_widget_show(dialog);
+
     g_signal_connect(submit, "clicked", G_CALLBACK(novo_cliente_callback), dialog_interface);
-    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba), interface);
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_clientes), interface);
 }
 
 void editar_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     GtkBuilder *dialog_interface;
     const gchar dialog_interface_nome[] = "interfaces/novocliente.xml";
     GError *erro = NULL;
+    
     GtkTreeView *lista;
     GtkTreeSelection *lista_seletor;
     GtkTreeModel *lista_estrutura;
@@ -137,7 +154,7 @@ void editar_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     gtk_window_set_title((GtkWindow *) dialog, "Editar Cliente");
 
     if (!gtk_tree_selection_get_selected(lista_seletor, &lista_estrutura, &lista_estrutura_primaria)){
-        mensagem_simples((GtkWindow *) dialog, "Atenção", "Selecione algum cliente para editar.");
+        mensagem_simples_clientes((GtkWindow *) dialog, "Atenção", "Selecione algum cliente para editar.");
         return;
     } else
         if (dialogOpened)
@@ -189,7 +206,7 @@ void editar_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     param[1] = dialog_interface;
 
     g_signal_connect(submit, "clicked", G_CALLBACK(editar_cliente_callback), param);
-    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba), interface);
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_clientes), interface);
     free(termo);
 }
 
@@ -205,16 +222,20 @@ void remover_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     struct cliente **cliente_busca;
     int quantidadeClientes;
     
-    lista = (GtkTreeView *) gtk_builder_get_object(interface, "tree_view_clientes");
     window = (GtkWidget *) gtk_builder_get_object(interface, "window");
+    lista = (GtkTreeView *) gtk_builder_get_object(interface, "tree_view_clientes");
     lista_seletor = gtk_tree_view_get_selection(lista);
     lista_estrutura = gtk_tree_view_get_model(lista);
     termo  = (char *) malloc(100 * sizeof(char));
 
     if (!gtk_tree_selection_get_selected(lista_seletor, &lista_estrutura, &lista_estrutura_primaria)){
-        mensagem_simples((GtkWindow *) window, "Atenção", "Selecione algum cliente para remover.");
+        mensagem_simples_clientes((GtkWindow *) window, "Atenção", "Selecione algum cliente para remover.");
         return;
-    }
+    } else
+        if (dialogOpened)
+            return;
+        else
+            dialogOpened = true;
 
     gtk_tree_model_get(lista_estrutura, &lista_estrutura_primaria, 0, &termo, -1);
     cliente_busca = buscar_cliente(CLIENTES_LISTA, termo, &quantidadeClientes);
@@ -225,8 +246,8 @@ void remover_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     gtk_dialog_add_button((GtkDialog *) dialog, "Não, cancelar", 1);
     gtk_widget_show_all(dialog);
 
-    g_signal_connect(dialog, "response", G_CALLBACK(remover_cliente_callback), cliente_busca[0]);
-    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba), interface);
+    g_signal_connect(dialog, "response", G_CALLBACK(remover_cliente_callback), &(cliente_busca[0]->index));
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_clientes), interface);
 }
 
 void novo_cliente_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
@@ -245,11 +266,11 @@ void novo_cliente_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
     dialog = (GtkWidget *) gtk_builder_get_object(dialog_interface, "dialog");
 
     strcpy(novo_cliente.nome, gtk_entry_get_text((GtkEntry *) nome));
-    novo_cliente.telefone.ddd = (unsigned short) gtk_spin_button_get_value((GtkSpinButton *) ddd);
+    novo_cliente.telefone.ddd = (unsigned short) gtk_spin_button_get_value_as_int((GtkSpinButton *) ddd);
     strcpy(novo_cliente.telefone.telefone, gtk_entry_get_text((GtkEntry *) telefone));
     strcpy(novo_cliente.endereco.logradouro, gtk_combo_box_text_get_active_text((GtkComboBoxText *) logradouro));
     strcpy(novo_cliente.endereco.endereco, gtk_entry_get_text((GtkEntry *) endereco));
-    novo_cliente.endereco.casa = (unsigned short) gtk_spin_button_get_value((GtkSpinButton *) numero);
+    novo_cliente.endereco.casa = (unsigned short) gtk_spin_button_get_value_as_int((GtkSpinButton *) numero);
     strcpy(novo_cliente.endereco.bairro, gtk_entry_get_text((GtkEntry *) bairro));
     strcpy(novo_cliente.endereco.cidade, gtk_entry_get_text((GtkEntry *) cidade));
     strcpy(novo_cliente.endereco.estado, gtk_combo_box_text_get_active_text((GtkComboBoxText *) estado));
@@ -259,10 +280,10 @@ void novo_cliente_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
         strlen(novo_cliente.endereco.endereco) == 0 ||
         strlen(novo_cliente.endereco.bairro) == 0 ||
         strlen(novo_cliente.endereco.cidade) == 0)
-        mensagem_simples((GtkWindow *) dialog, "Erro", "Todos os campos devem ser preenchidos.");
-    else if(!adicionar_cliente(CLIENTES_LISTA, novo_cliente)){
-        mensagem_simples((GtkWindow *) dialog, "Erro", "Já existe um cliente com este nome.");
-    } else
+        mensagem_simples_clientes((GtkWindow *) dialog, "Erro", "Todos os campos devem ser preenchidos.");
+    else if(!adicionar_cliente(CLIENTES_LISTA, novo_cliente))
+        mensagem_simples_clientes((GtkWindow *) dialog, "Erro", "Já existe um cliente com este nome.");
+    else
         gtk_window_close((GtkWindow *) dialog);
 }
 
@@ -287,7 +308,7 @@ void editar_cliente_callback(GtkWidget *botao, void **param){
         strlen(gtk_entry_get_text((GtkEntry *) endereco)) == 0 ||
         strlen(gtk_entry_get_text((GtkEntry *) bairro)) == 0 ||
         strlen(gtk_entry_get_text((GtkEntry *) cidade)) == 0){
-        mensagem_simples((GtkWindow *) dialog, "Erro", "Todos os campos devem ser preenchidos.");
+        mensagem_simples_clientes((GtkWindow *) dialog, "Erro", "Todos os campos devem ser preenchidos.");
     } else {
         strcpy(novo_cliente->nome, gtk_entry_get_text((GtkEntry *) nome));
         novo_cliente->telefone.ddd = (unsigned short) gtk_spin_button_get_value((GtkSpinButton *) ddd);
@@ -304,13 +325,9 @@ void editar_cliente_callback(GtkWidget *botao, void **param){
     }
 }
 
-void remover_cliente_callback(GtkWidget *dialog, int id, struct cliente *cliente){
-    switch (id){
-        case 0:
-            remover_cliente(CLIENTES_LISTA, cliente->index);
-            break;
-    }
-
+void remover_cliente_callback(GtkWidget *dialog, int id, int *index){
+    if (id == 0)
+        remover_cliente(CLIENTES_LISTA, *index);
     gtk_widget_destroy(dialog);
 }
 

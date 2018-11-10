@@ -1,7 +1,7 @@
 //  ;=====================================
 //  ;  Title: clientes.c
 //  ;  Author: Vinicius Costa Castro
-//  ;  Date: 10/13/18
+//  ;  Date: 09/11/18
 //  ;=====================================
 
 #include "../headers/clientes.h"
@@ -120,11 +120,10 @@ int adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
 }
 
 int remover_cliente(Clientes *lista, int index){
-    for (; index < lista->tamanho; index++){
+    for (; index < lista->tamanho; index++)
         lista->clientes[index] = lista->clientes[index + 1];
-    }
-    
     lista->clientes = (struct cliente *) realloc(lista->clientes, --(lista->tamanho) * sizeof(struct cliente));
+    return true;
 }
 
 int modificar_cliente(Clientes *lista, int index, struct cliente *cliente){

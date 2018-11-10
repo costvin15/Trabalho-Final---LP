@@ -19,7 +19,7 @@
       <!-- column-name gint -->
       <column type="gint"/>
       <!-- column-name gfloat -->
-      <column type="gfloat"/>
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">
@@ -185,7 +185,6 @@
                       <object class="GtkCellRendererText"/>
                       <attributes>
                         <attribute name="text">2</attribute>
-                        <attribute name="max-width-chars">2</attribute>
                       </attributes>
                     </child>
                   </object>
@@ -202,7 +201,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="botao_novo_produto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
@@ -214,7 +213,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="botao_editar_produto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
@@ -226,7 +225,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="botao_remover_produto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
