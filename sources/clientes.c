@@ -119,6 +119,16 @@ int adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
     return true;
 }
 
+int remover_cliente(Clientes *lista, int index){
+    for (; index < lista->tamanho; index++){
+        lista->clientes[index] = lista->clientes[index + 1];
+    }
+
+    printf("-> %d\n", sizeof(struct cliente));
+    printf("-> %d\n", (lista->tamanho - 1) * sizeof(struct cliente));
+    lista->clientes = (struct cliente *) realloc(lista->clientes, --(lista->tamanho) * sizeof(struct cliente));
+}
+
 int modificar_cliente(Clientes *lista, int index, struct cliente *cliente){
     lista->clientes[index] = *cliente;
     return true;

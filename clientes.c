@@ -22,6 +22,9 @@ void novo_cliente_callback(GtkWidget *, GtkBuilder *);
 void editar_cliente_dialog(GtkWidget *, GtkBuilder *);
 void editar_cliente_callback(GtkWidget *, void**);
 
+void remover_cliente_dialog(GtkWidget *, GtkBuilder *);
+void remover_cliente_callback(GtkWidget *, int, struct cliente *);
+
 void clientes_gui(GtkBuilder *interface, Clientes *clientes){
     CLIENTES_LISTA = clientes;
     clientes_aba(interface, clientes);
@@ -58,15 +61,13 @@ void recarregar_aba(GtkDialog *dialog, GtkBuilder *interface){
 }
 
 void mensagem_simples(GtkWindow *janela, gchar *titulo, gchar *mensagem){
-    GtkWidget *dialog, *label, *conteudo;
+    GtkWidget *dialog;
     GtkDialogFlags flags;
-    flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
 
-    dialog = gtk_dialog_new_with_buttons(titulo, janela, flags, "OK", GTK_RESPONSE_NONE, NULL);
-    conteudo = gtk_dialog_get_content_area((GtkDialog *) dialog);
-    label = gtk_label_new(mensagem);
+    dialog = gtk_message_dialog_new(janela, flags, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, mensagem);
+    gtk_window_set_title((GtkWindow *) dialog, titulo);
     g_signal_connect_swapped(dialog, "response", G_CALLBACK(gtk_widget_destroy), dialog);
-    gtk_container_add((GtkContainer *) conteudo, label);
     gtk_widget_show_all(dialog);
 }
 
@@ -135,9 +136,10 @@ void editar_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
 
     gtk_window_set_title((GtkWindow *) dialog, "Editar Cliente");
 
-    if (!gtk_tree_selection_get_selected(lista_seletor, &lista_estrutura, &lista_estrutura_primaria))
+    if (!gtk_tree_selection_get_selected(lista_seletor, &lista_estrutura, &lista_estrutura_primaria)){
+        mensagem_simples((GtkWindow *) dialog, "Atenção", "Selecione algum cliente para editar.");
         return;
-    else
+    } else
         if (dialogOpened)
             return;
         else
@@ -187,6 +189,43 @@ void editar_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
     param[1] = dialog_interface;
 
     g_signal_connect(submit, "clicked", G_CALLBACK(editar_cliente_callback), param);
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba), interface);
+    free(termo);
+}
+
+void remover_cliente_dialog(GtkWidget *botao, GtkBuilder *interface){
+    GtkWidget *dialog, *window;
+    GtkDialogFlags flags;
+    GtkTreeView *lista;
+    GtkTreeSelection *lista_seletor;
+    GtkTreeModel *lista_estrutura;
+    GtkTreeIter lista_estrutura_primaria;
+    
+    char *termo;
+    struct cliente **cliente_busca;
+    int quantidadeClientes;
+    
+    lista = (GtkTreeView *) gtk_builder_get_object(interface, "tree_view_clientes");
+    window = (GtkWidget *) gtk_builder_get_object(interface, "window");
+    lista_seletor = gtk_tree_view_get_selection(lista);
+    lista_estrutura = gtk_tree_view_get_model(lista);
+    termo  = (char *) malloc(100 * sizeof(char));
+
+    if (!gtk_tree_selection_get_selected(lista_seletor, &lista_estrutura, &lista_estrutura_primaria)){
+        mensagem_simples((GtkWindow *) window, "Atenção", "Selecione algum cliente para remover.");
+        return;
+    }
+
+    gtk_tree_model_get(lista_estrutura, &lista_estrutura_primaria, 0, &termo, -1);
+    cliente_busca = buscar_cliente(CLIENTES_LISTA, termo, &quantidadeClientes);
+
+    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+    dialog = gtk_message_dialog_new((GtkWindow *) window, flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "Você tem certeza em remover o cliente %s?", cliente_busca[0]->nome);
+    gtk_dialog_add_button((GtkDialog *) dialog, "Sim, remover", 0);
+    gtk_dialog_add_button((GtkDialog *) dialog, "Não, cancelar", 1);
+    gtk_widget_show_all(dialog);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(remover_cliente_callback), cliente_busca[0]);
     g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba), interface);
 }
 
@@ -265,6 +304,16 @@ void editar_cliente_callback(GtkWidget *botao, void **param){
     }
 }
 
+void remover_cliente_callback(GtkWidget *dialog, int id, struct cliente *cliente){
+    switch (id){
+        case 0:
+            remover_cliente(CLIENTES_LISTA, cliente->index);
+            break;
+    }
+
+    gtk_widget_destroy(dialog);
+}
+
 void clientes_botao(GtkBuilder *interface){
     GtkWidget *botao_novo_cliente, *botao_editar_cliente, *botao_remover_cliente;
 
@@ -275,4 +324,5 @@ void clientes_botao(GtkBuilder *interface){
     g_signal_connect(botao_editar_cliente, "clicked", G_CALLBACK(editar_cliente_dialog), interface);
 
     botao_remover_cliente = (GtkWidget *) gtk_builder_get_object(interface, "botao_remover_cliente");
+    g_signal_connect(botao_remover_cliente, "clicked", G_CALLBACK(remover_cliente_dialog), interface);
 }

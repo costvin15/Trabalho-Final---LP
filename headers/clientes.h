@@ -29,7 +29,7 @@ struct telefone {
 };
 
 struct cliente {
-    int index;
+    unsigned int index;
     char nome[100];
     struct telefone telefone;
     struct endereco endereco;
@@ -48,6 +48,7 @@ void popular_clientes(Clientes *);
 void salvar_clientes(Clientes *);
 
 int adicionar_cliente(Clientes *, struct cliente);
+int remover_cliente(Clientes *, int);
 int modificar_cliente(Clientes *, int, struct cliente *);
 struct cliente **buscar_cliente(Clientes *, char *, int *);
 
