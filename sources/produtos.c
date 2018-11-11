@@ -42,9 +42,9 @@ void popular_produtos(Produtos *lista){
     fscanf(dados, "%d ", &quantidade);
 
     for (; quantidade > 0; quantidade--){
-        fscanf(dados, "%[^\n]%*c", &p.nome);
-        fscanf(dados, "%d ", &p.EmEstoque);
-        fscanf(dados, "%lf ", &p.preco);
+        fscanf(dados, "%[^\n]%*c\n", &p.nome);
+        fscanf(dados, "%d\n", &p.EmEstoque);
+        fscanf(dados, "%lf\n", &p.preco);
         adicionar_produto(lista, p);
     }
 }

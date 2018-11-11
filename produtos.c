@@ -43,7 +43,7 @@ void produtos_aba(GtkBuilder *interface, Produtos *produtos){
 
     gtk_list_store_clear(lista_estrutura);
 
-    char preco[9];
+    char preco[17];
     int i;
     for (i = 0; i < produtos->tamanho; i++){
         sprintf(preco, "R$ %.2lf", produtos->produtos[i].preco);
