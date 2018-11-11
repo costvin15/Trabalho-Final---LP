@@ -18,7 +18,6 @@
 
     <object class="GtkDialog" id="dialog">
         <property name="visible">False</property>
-        <property name="title">Novo cliente</property>
         <property name="border_width">5</property>
         <property name="window_position">center</property>
         <property name="resizable">False</property>
@@ -86,21 +85,16 @@
                         <property name="active">0</property>
                         <items>
                             <item translatable="yes">Rua</item>
-                            <item translatable="yes">Aeroporto</item>
                             <item translatable="yes">Alameda</item>
-                            <item translatable="yes">Área</item>
                             <item translatable="yes">Avenida</item>
-                            <item translatable="yes">Campo</item>
                             <item translatable="yes">Chácara</item>
                             <item translatable="yes">Colônia</item>
                             <item translatable="yes">Conjunto</item>
                             <item translatable="yes">Distrito</item>
                             <item translatable="yes">Esplanada</item>
-                            <item translatable="yes">Estação</item>
                             <item translatable="yes">Estrada</item>
                             <item translatable="yes">Largo</item>
                             <item translatable="yes">Loteamento</item>
-                            <item translatable="yes">Parque</item>
                             <item translatable="yes">Sítio</item>
                             <item translatable="yes">Travessa</item>
                             <item translatable="yes">Via</item>
@@ -135,6 +129,21 @@
                     <object class="GtkSpinButton" id="inputNumero">
                         <property name="visible">True</property>
                         <property name="adjustment">adjustment_casa</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Bairro</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkEntry" id="inputBairro">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder-text">Bairro</property>
                     </object>
                 </child>
 

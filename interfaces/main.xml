@@ -22,11 +22,9 @@
       <column type="gchararray"/>
     </columns>
   </object>
-
   <object class="GtkWindow" id="window">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="window_position">center</property>
     <property name="title">NerdZ</property>
     <property name="default_width">750</property>
     <property name="default_height">600</property>
@@ -92,9 +90,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkToolButton" id="toolbuttonNovoCliente">
+                  <object class="GtkToolButton" id="botao_novo_cliente">
                     <property name="visible">True</property>
-                    <property name="tooltip-text">Novo Cliente</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
                     <property name="icon_name">document-new</property>
@@ -105,9 +102,8 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="botao_editar_cliente">
                     <property name="visible">True</property>
-                    <property name="tooltip-text">Editar Cliente</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
                     <property name="icon_name">accessories-text-editor</property>
@@ -118,9 +114,8 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="toolbuttonApagarCliente">
+                  <object class="GtkToolButton" id="botao_remover_cliente">
                     <property name="visible">True</property>
-                    <property name="tooltip-text">Apagar Cliente</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
                     <property name="icon_name">edit-delete</property>
@@ -206,7 +201,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkToolButton" id="toolbuttonNovoProduto">
+                  <object class="GtkToolButton" id="botao_novo_produto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
@@ -218,7 +213,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton">
+                  <object class="GtkToolButton" id="botao_editar_produto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>
@@ -230,7 +225,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="remover_produto_button">
+                  <object class="GtkToolButton" id="botao_remover_produto">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">toolbutton</property>

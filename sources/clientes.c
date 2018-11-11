@@ -1,10 +1,19 @@
 //  ;=====================================
 //  ;  Title: clientes.c
 //  ;  Author: Vinicius Costa Castro
-//  ;  Date: 10/13/18
+//  ;  Date: 09/11/18
 //  ;=====================================
 
 #include "../headers/clientes.h"
+
+Clientes *reutilizar_clientes(){
+    static Clientes *lista = NULL;
+    if (lista)
+        return lista;
+    lista = criar_clientes();
+    popular_clientes(lista);
+    return lista;
+}
 
 Clientes *criar_clientes(){
     Clientes *nova_lista = (Clientes *) malloc(sizeof(Clientes));
@@ -32,19 +41,18 @@ void popular_clientes(Clientes *lista){
     fscanf(dados, "%d ", &quantidade);
 
     for (; quantidade > 0; quantidade--){
-        fscanf(dados, "%[^\n]%*c", &c.nome);
-        fscanf(dados, "%d ", &c.telefone.ddd);
-        fscanf(dados, "%[^\n]%*c", &c.telefone.telefone);
-        fscanf(dados, "%[^\n]%*c", &c.endereco.logradouro);
-        fscanf(dados, "%[^\n]%*c", &c.endereco.endereco);
-        fscanf(dados, "%d ", &c.endereco.casa);
-        fscanf(dados, "%[^\n]%*c", &c.endereco.cidade);
-        fscanf(dados, "%[^\n]%*c", &c.endereco.estado);
+        fscanf(dados, "%[^\n]%*c\n", &c.nome);
+        fscanf(dados, "%d\n", &c.telefone.ddd);
+        fscanf(dados, "%[^\n]%*c\n", &c.telefone.telefone);
+        fscanf(dados, "%[^\n]%*c\n", &c.endereco.logradouro);
+        fscanf(dados, "%[^\n]%*c\n", &c.endereco.endereco);
+        fscanf(dados, "%d\n", &c.endereco.casa);
+        fscanf(dados, "%[^\n]%*c\n", &c.endereco.bairro);
+        fscanf(dados, "%[^\n]%*c\n", &c.endereco.cidade);
+        fscanf(dados, "%[^\n]%*c\n", &c.endereco.estado);
 
         adicionar_cliente(lista, c);
     }
-
-    fclose(dados);
 }
 
 void salvar_clientes(Clientes *lista){
@@ -64,11 +72,10 @@ void salvar_clientes(Clientes *lista){
         fprintf(dados, "%s\n", lista->clientes[i].endereco.logradouro);
         fprintf(dados, "%s\n", lista->clientes[i].endereco.endereco);
         fprintf(dados, "%d\n", lista->clientes[i].endereco.casa);
+        fprintf(dados, "%s\n", lista->clientes[i].endereco.bairro);
         fprintf(dados, "%s\n", lista->clientes[i].endereco.cidade);
         fprintf(dados, "%s\n", lista->clientes[i].endereco.estado);
     }
-
-    fclose(dados);
 }
 
 static int BuscaBinaria(Clientes *lista, char *termo, int inicio, int fim){
@@ -98,28 +105,29 @@ int adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
     lista->clientes = (struct cliente *) realloc(lista->clientes, (lista->tamanho + 1) * sizeof(struct cliente));
     int i, pos = BuscaBinaria(lista, novo_cliente.nome, 0, lista->tamanho - 1);
 
-    if (!strcmp(lista->clientes[pos].nome, novo_cliente.nome))
+    if (strcmp(lista->clientes[pos].nome, novo_cliente.nome) == 0)
         return false;
 
-    for (i = lista->tamanho - 1; i >= pos; i--)
+    for (i = lista->tamanho - 1; i >= pos; i--){
+        lista->clientes[i].index = i + 1;
         lista->clientes[i + 1] = lista->clientes[i];
+    }
+
+    novo_cliente.index = pos;
     lista->clientes[pos] = novo_cliente;
     lista->tamanho++;
     return true;
 }
 
-int remover_cliente(Clientes *lista, char *nome_cliente){
-    if (!lista)
-        return false;
-    
-    int pos;
-    pos = BuscaBinaria(lista, nome_cliente, 0, lista->tamanho - 1);
+int remover_cliente(Clientes *lista, int index){
+    for (; index < lista->tamanho; index++)
+        lista->clientes[index] = lista->clientes[index + 1];
+    lista->clientes = (struct cliente *) realloc(lista->clientes, --(lista->tamanho) * sizeof(struct cliente));
+    return true;
+}
 
-    if (strcmp(nome_cliente, lista->clientes[pos].nome))
-        return false;
-    for (; pos < lista->tamanho; pos++)
-        lista->clientes[pos] = lista->clientes[pos + 1];
-    lista->clientes = (struct cliente *) realloc(lista->clientes, (--lista->tamanho) * sizeof(struct cliente));
+int modificar_cliente(Clientes *lista, int index, struct cliente *cliente){
+    lista->clientes[index] = *cliente;
     return true;
 }
 

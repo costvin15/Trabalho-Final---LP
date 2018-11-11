@@ -15,6 +15,7 @@
 #include <stdbool.h>
 
 struct produto {
+    unsigned int index;
     char nome[100];
     int EmEstoque;
     double preco;
@@ -25,13 +26,16 @@ typedef struct {
     struct produto *produtos;
 } Produtos;
 
+Produtos *reutilizar_produtos();
 Produtos *criar_produtos();
 void apagar_produtos(Produtos *);
 
 void popular_produtos(Produtos *);
 void salvar_produtos(Produtos *);
 
-void adicionar_produto(Produtos *, struct produto);
+int adicionar_produto(Produtos *, struct produto);
+int remover_produto(Produtos *, int);
+int modificar_produto(Produtos *, int, struct produto *);
 struct produto **buscar_produto(Produtos *, char *, int *);
 
 #endif

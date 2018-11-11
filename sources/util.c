@@ -1,7 +1,7 @@
 //  ;=====================================
 //  ;  Title: util.c
 //  ;  Author: Vinicius Costa Castro
-//  ;  Date: 10/13/18
+//  ;  Date: 13/10/18
 //  ;=====================================
 
 #include "../headers/util.h"
@@ -10,7 +10,7 @@ char *palavra_para_palavra_minuscula(char *palavra){
     int i;
     char *resultante = (char *) malloc((strlen(palavra) + 1) * sizeof(char));
 
-    if (palavra == NULL)
+    if (!palavra)
         return NULL;
 
     for (i = 0; palavra[i] != '\0'; i++)
