@@ -120,7 +120,7 @@ int adicionar_cliente(Clientes *lista, struct cliente novo_cliente){
 }
 
 int remover_cliente(Clientes *lista, int index){
-    for (; index < lista->tamanho; index++)
+    for (; index < lista->tamanho - 1; index++)
         lista->clientes[index] = lista->clientes[index + 1];
     lista->clientes = (struct cliente *) realloc(lista->clientes, --(lista->tamanho) * sizeof(struct cliente));
     return true;

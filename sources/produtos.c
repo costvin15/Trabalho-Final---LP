@@ -106,7 +106,7 @@ int adicionar_produto(Produtos *lista, struct produto novo_produto){
 }
 
 int remover_produto(Produtos *lista, int index){
-    for (; index < lista->tamanho; index++)
+    for (; index < lista->tamanho - 1; index++)
         lista->produtos[index] = lista->produtos[index + 1];
     lista->produtos = (struct produto *) realloc(lista->produtos, --(lista->tamanho) * sizeof(struct produto));
     return true;

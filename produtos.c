@@ -268,11 +268,14 @@ void produtos_botao(GtkBuilder *interface){
     GtkWidget *botao_novo_produto, *botao_editar_produto, *botao_remover_produto;
     
     botao_novo_produto = (GtkWidget *) gtk_builder_get_object(interface, "botao_novo_produto");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_novo_produto, "Adicionar Produto");
     g_signal_connect(botao_novo_produto, "clicked", G_CALLBACK(novo_produto_dialog), interface);
 
     botao_editar_produto = (GtkWidget *) gtk_builder_get_object(interface, "botao_editar_produto");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_editar_produto, "Editar Produto");
     g_signal_connect(botao_editar_produto, "clicked", G_CALLBACK(editar_produto_dialog), interface);
 
     botao_remover_produto = (GtkWidget *) gtk_builder_get_object(interface, "botao_remover_produto");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_remover_produto, "Remover Produto");
     g_signal_connect(botao_remover_produto, "clicked", G_CALLBACK(remover_produto_dialog), interface);
 }

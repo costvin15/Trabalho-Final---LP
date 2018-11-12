@@ -335,11 +335,14 @@ void clientes_botao(GtkBuilder *interface){
     GtkWidget *botao_novo_cliente, *botao_editar_cliente, *botao_remover_cliente;
 
     botao_novo_cliente = (GtkWidget *) gtk_builder_get_object(interface, "botao_novo_cliente");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_novo_cliente, "Adicionar Cliente");
     g_signal_connect(botao_novo_cliente, "clicked", G_CALLBACK(novo_cliente_dialog), interface);
 
     botao_editar_cliente = (GtkWidget *) gtk_builder_get_object(interface, "botao_editar_cliente");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_editar_cliente, "Editar Cliente");
     g_signal_connect(botao_editar_cliente, "clicked", G_CALLBACK(editar_cliente_dialog), interface);
 
     botao_remover_cliente = (GtkWidget *) gtk_builder_get_object(interface, "botao_remover_cliente");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_remover_cliente, "Remover Cliente");
     g_signal_connect(botao_remover_cliente, "clicked", G_CALLBACK(remover_cliente_dialog), interface);
 }
