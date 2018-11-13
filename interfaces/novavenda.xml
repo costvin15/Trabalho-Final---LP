@@ -36,7 +36,7 @@
                 </child>
 
                 <child>
-                    <object class="GtkEntry" id="inputBairro">
+                    <object class="GtkEntry" id="inputCliente">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="placeholder-text">Bairro</property>

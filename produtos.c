@@ -80,8 +80,6 @@ void novo_produto_dialog(GtkWidget *botao, GtkBuilder *interface){
     GtkWidget *window, *dialog, *submit;
     GError *erro = NULL;
 
-    printf("ad");
-
     if (dialogOpened)
         return;
     else
@@ -97,12 +95,12 @@ void novo_produto_dialog(GtkWidget *botao, GtkBuilder *interface){
     dialog = (GtkWidget *) gtk_builder_get_object(dialog_interface, "dialog");
     submit = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputSubmit");
 
-    gtk_window_set_title((GtkWindow *) dialog, "Novo Produto");
-
     if (!window || !dialog || !submit){
         fprintf(stderr, "Nao ha nenhum objeto com este id.\n");
         return;
     }
+    
+    gtk_window_set_title((GtkWindow *) dialog, "Novo Produto");
 
     gtk_window_set_transient_for((GtkWindow *) dialog, (GtkWindow *) window);
     gtk_widget_show(dialog);

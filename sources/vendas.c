@@ -1,5 +1,13 @@
 #include "../headers/vendas.h"
 
+Vendas *reutilizar_vendas(){
+    static Vendas *lista = NULL;
+    if (lista)
+        return lista;
+    lista = criar_vendas();
+    return lista;
+}
+
 Vendas *criar_vendas(){
     Vendas *lista = (Vendas *) malloc(sizeof(Vendas));
     lista->tamanho = 0;

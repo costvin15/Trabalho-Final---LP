@@ -3,9 +3,11 @@
 
 #include "clientes.c"
 #include "produtos.c"
+#include "vendas.c"
 
 #include "headers/clientes.h"
 #include "headers/produtos.h"
+#include "headers/vendas.h"
 
 void salvar_ao_sair(GtkWidget *, void **);
 
@@ -14,6 +16,7 @@ int main(int argc, char **argv){
 
     Clientes *clientes;
     Produtos *produtos;
+    Vendas *vendas;
 
     GtkBuilder *interface;
     const gchar interface_nome[] = "interfaces/main.xml";
@@ -21,6 +24,7 @@ int main(int argc, char **argv){
 
     clientes = reutilizar_clientes();
     produtos = reutilizar_produtos();
+    vendas = reutilizar_vendas();
 
     interface = gtk_builder_new();
     if (!gtk_builder_add_from_file(interface, interface_nome, NULL)){
@@ -39,6 +43,7 @@ int main(int argc, char **argv){
 
     clientes_gui(interface, clientes);
     produtos_gui(interface, produtos);
+    vendas_gui(interface, vendas);
 
     gtk_main();
 }

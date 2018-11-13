@@ -20,6 +20,7 @@ typedef struct {
     struct venda *vendas;
 } Vendas;
 
+Vendas *reutilizar_vendas();
 Vendas *criar_vendas();
 void apagar_vendas(Vendas *);
 
