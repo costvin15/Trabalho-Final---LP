@@ -28,6 +28,8 @@
       <column type="gchararray"/>
       <!-- column-name gchararray1 -->
       <column type="gchararray"/>
+      <column type="gchararray"/>
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">
@@ -307,11 +309,33 @@
                 </child>
                 <child>
                   <object class="GtkTreeViewColumn">
-                    <property name="title" translatable="yes">Horário da Venda</property>
+                    <property name="title" translatable="yes">Produtos</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
                         <attribute name="text">1</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Preço</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">2</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Horário</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">3</attribute>
                       </attributes>
                     </child>
                   </object>

@@ -18,17 +18,19 @@ typedef struct {
     unsigned int tamanho;
     struct produto_vendido *produtos;
     double desconto;
+    int descontopercento;
     double preco;
     double preco_final;
 } Carrinho;
 
 Carrinho *criar_carrinho();
 void apagar_carrinho(Carrinho *);
-void redefinir_carrinho(Carrinho *);
 
-void adicionar_produto_carrinho(Carrinho *, struct produto, int quantidade);
+void adicionar_produto_vendido_carrinho(Carrinho *, struct produto_vendido);
+
+void adicionar_produto_carrinho(Carrinho *, struct produto, int);
 void remover_produto_carrinho(Carrinho *, int);
 
-void definir_desconto(Carrinho *, double);
+void definir_desconto(Carrinho *, int);
 
 #endif

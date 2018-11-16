@@ -34,9 +34,10 @@ int main(int argc, char **argv){
 
     janela = (GtkWidget *) gtk_builder_get_object(interface, "window");
 
-    void **argumentos = (void **) malloc(2 * sizeof(void *));
+    void **argumentos = (void **) malloc(3 * sizeof(void *));
     argumentos[0] = clientes;
     argumentos[1] = produtos;
+    argumentos[2] = vendas;
 
     g_signal_connect(janela, "destroy", G_CALLBACK(salvar_ao_sair), argumentos);
     g_signal_connect(janela, "destroy", G_CALLBACK(gtk_main_quit), NULL);
@@ -51,10 +52,14 @@ int main(int argc, char **argv){
 void salvar_ao_sair(GtkWidget *janela, void **argumentos){
     Clientes *clientes = (Clientes *) argumentos[0];
     Produtos *produtos = (Produtos *) argumentos[1];
+    Vendas *vendas = (Vendas *) argumentos[2];
 
     salvar_clientes(clientes);
     apagar_clientes(clientes);
 
     salvar_produtos(produtos);
     apagar_produtos(produtos);
+
+    salvar_vendas(vendas);
+    apagar_vendas(vendas);
 }

@@ -55,6 +55,7 @@ void salvar_produtos(Produtos *lista){
         return;
 
     fprintf(dados, "%d\n", lista->tamanho);
+    
     int i;
     for (i = 0; i < lista->tamanho; i++){
         fprintf(dados, "%s\n", lista->produtos[i].nome);
