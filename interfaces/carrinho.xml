@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<interface>
+    <object class="GtkListStore" id="list_store_carrinho">
+        <columns>
+            <column type="gchararray" />
+            <column type="gint" />
+            <column type="gchararray" />
+        </columns>
+    </object>
+
+    <object class="GtkAdjustment" id="quantidade_adjustment">
+        <property name="lower">1</property>
+        <property name="upper">2147483647</property>
+        <property name="value">1</property>
+        <property name="step-increment">1</property>
+    </object>
+
+    <object class="GtkDialog" id="dialog">
+        <property name="can_focus">False</property>
+        <property name="border_width">5</property>
+        <property name="resizable">False</property>
+        <property name="window_position">center</property>
+        <property name="default_width">450</property>
+        
+        <child internal-child="vbox">
+            <object class="GtkBox">
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">2</property>
+                
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label">Carrinho atual</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <property name="height_request">100</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="orientation">vertical</property>
+
+                        <child>
+                            <object class="GtkTreeView" id="tree_view_carrinho">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <property name="model">list_store_carrinho</property>
+
+                                <child internal-child="selection">
+                                    <object class="GtkTreeSelection" />
+                                </child>
+                                
+                                <child>
+                                    <object class="GtkTreeViewColumn">
+                                        <property name="title" translatable="yes">Nome</property>
+                                        <child>
+                                            <object class="GtkCellRendererText" />
+                                            <attributes>
+                                                <attribute name="text">0</attribute>
+                                            </attributes>
+                                        </child>
+                                    </object>
+                                </child>
+
+                                <child>
+                                    <object class="GtkTreeViewColumn">
+                                        <property name="title" translatable="yes">Quantidade</property>
+                                        <child>
+                                            <object class="GtkCellRendererText" />
+                                            <attributes>
+                                                <attribute name="text">1</attribute>
+                                            </attributes>
+                                        </child>
+                                    </object>
+                                </child>
+
+                                <child>
+                                    <object class="GtkTreeViewColumn">
+                                        <property name="title" translatable="yes">Preço Unitário</property>
+                                        <child>
+                                            <object class="GtkCellRendererText" />
+                                            <attributes>
+                                                <attribute name="text">2</attribute>
+                                            </attributes>
+                                        </child>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label">Adicionar ao carrinho</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="orientation">horizontal</property>
+                        
+                        <child>
+                            <object class="GtkEntry" id="inputProduto">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="placeholder-text">Digite o nome do produto</property>
+                            </object>
+                            <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                            </packing>
+                        </child>
+
+                        <child>
+                            <object class="GtkSpinButton" id="inputQuantidade">
+                                <property name="visible">True</property>
+                                <property name="adjustment">quantidade_adjustment</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkButton" id="inputSubmit">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label">Adicionar ao carrinho</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
+</interface>

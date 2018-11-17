@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <requires lib="gtk+" version="3.10" />
+
+    <object class="GtkAdjustment" id="adjustment_ddd">
+        <property name="lower">11</property>
+        <property name="upper">99</property>
+        <property name="value">11</property>
+        <property name="step_increment">1</property>
+    </object>
+
+    <object class="GtkAdjustment" id="adjustment_casa">
+        <property name="lower">0</property>
+        <property name="upper">100000</property>
+        <property name="value">1</property>
+        <property name="step_increment">1</property>
+    </object>
+
+    <object class="GtkDialog" id="dialog">
+        <property name="visible">False</property>
+        <property name="border_width">5</property>
+        <property name="window_position">center</property>
+        <property name="resizable">False</property>
+        <property name="default_width">300</property>
+
+        <child internal-child="vbox">
+            <object class="GtkBox">
+                <property name="spacing">2</property>
+                <property name="orientation">vertical</property>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Nome</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkEntry" id="inputNome">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder-text">Nome</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">DDD</property>
+                    </object>
+                </child>
+                
+                <child>
+                    <object class="GtkSpinButton" id="inputDDD">
+                        <property name="visible">True</property>
+                        <property name="adjustment">adjustment_ddd</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Telefone</property>
+                    </object>
+                </child>
+                
+                <child>
+                    <object class="GtkEntry" id="inputTelefone">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder-text">Telefone</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Logradouro</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkComboBoxText" id="inputLogradouro">
+                        <property name="visible">True</property>
+                        <property name="active">0</property>
+                        <items>
+                            <item translatable="yes">Rua</item>
+                            <item translatable="yes">Alameda</item>
+                            <item translatable="yes">Avenida</item>
+                            <item translatable="yes">Chácara</item>
+                            <item translatable="yes">Colônia</item>
+                            <item translatable="yes">Conjunto</item>
+                            <item translatable="yes">Distrito</item>
+                            <item translatable="yes">Esplanada</item>
+                            <item translatable="yes">Estrada</item>
+                            <item translatable="yes">Largo</item>
+                            <item translatable="yes">Loteamento</item>
+                            <item translatable="yes">Sítio</item>
+                            <item translatable="yes">Travessa</item>
+                            <item translatable="yes">Via</item>
+                            <item translatable="yes">Vila</item>
+                        </items>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Endereço</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkEntry" id="inputEndereco">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder-text">Endereço</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Número</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkSpinButton" id="inputNumero">
+                        <property name="visible">True</property>
+                        <property name="adjustment">adjustment_casa</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Bairro</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkEntry" id="inputBairro">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder-text">Bairro</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Cidade</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkEntry" id="inputCidade">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder-text">Cidade</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label">Estado</property>
+                    </object>
+                </child>
+                
+                <child>
+                    <object class="GtkComboBoxText" id="inputEstado">
+                        <property name="visible">True</property>
+                        <property name="active">0</property>
+                        <items>
+                            <item translatable="yes">Acre</item>
+                            <item translatable="yes">Alagoas</item>
+                            <item translatable="yes">Amapá</item>
+                            <item translatable="yes">Amazonas</item>
+                            <item translatable="yes">Bahia</item>
+                            <item translatable="yes">Ceará</item>
+                            <item translatable="yes">Distrito Federal</item>
+                            <item translatable="yes">Espírito Santo</item>
+                            <item translatable="yes">Goiás</item>
+                            <item translatable="yes">Maranhão</item>
+                            <item translatable="yes">Mato Grosso</item>
+                            <item translatable="yes">Mato Grosso do Sul</item>
+                            <item translatable="yes">Minas Gerais</item>
+                            <item translatable="yes">Pará</item>
+                            <item translatable="yes">Paraíba</item>
+                            <item translatable="yes">Paraná</item>
+                            <item translatable="yes">Pernambuco</item>
+                            <item translatable="yes">Piauí</item>
+                            <item translatable="yes">Rio de Janeiro</item>
+                            <item translatable="yes">Rio Grande do Norte</item>
+                            <item translatable="yes">Rio Grande do Sul</item>
+                            <item translatable="yes">Rondônia</item>
+                            <item translatable="yes">Roraima</item>
+                            <item translatable="yes">Santa Catarina</item>
+                            <item translatable="yes">São Paulo</item>
+                            <item translatable="yes">Sergipe</item>
+                            <item translatable="yes">Tocantins</item>
+                        </items>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="label"></property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkButton" id="inputSubmit">
+                        <property name="visible">True</property>
+                        <property name="label">Cadastrar</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
+</interface>

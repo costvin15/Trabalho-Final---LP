@@ -1,0 +1,32 @@
+#include <windows.h>
+LANGUAGE LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN
+VS_VERSION_INFO ICON "icon.ico"
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 1,0,0,1
+PRODUCTVERSION 1,0,0,1
+FILEFLAGSMASK 0x3fL
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+{
+    BLOCK "StringFileInfo" {
+        BLOCK "040904E4" {
+            VALUE "Build",            "November 2018\0"
+            VALUE "Comments",         "Educational Purposes Only.\0"
+            VALUE "CompanyName",      "Vinicius Costa & Yure Guajajara\0"
+            VALUE "Developer",        "Vinicius Costa e Yure Guajajara\0"
+            VALUE "FileDescription",  "Trabalho Final - Linguagem de Programacao\0"
+            VALUE "FileVersion",      "1.0\0"
+            VALUE "InternalName",     "Trabalho Final - LP\0"
+            VALUE "LegalCopyright",   "Copyright (C) 2018\0"
+            VALUE "LegalTrademarks",  "All rights reserved.\0"
+            VALUE "OriginalFilename", "TrabalhoFinalLP.exe\0"
+            VALUE "ProductName",      "Sistema de Loja NerdZ\0"
+            VALUE "ProductVersion",   "1.0.000\0"
+        }
+    }
+    
+    BLOCK "VarFileInfo" {
+        VALUE "Translation", 0x409, 1252
+    }
+}
