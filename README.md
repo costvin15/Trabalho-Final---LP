@@ -14,7 +14,7 @@ Registrar, editar e remover clientes, produtos; realizar vendas, salvando todas 
 
 ### Como compilar
 
-[Para compilar, você precisa primeiramente instalar e configurar a biblioteca.](https://www.gtk.org/download/index.php "Página de Download - The GTK+ Project")
+[Para compilar, você precisa primeiramente instalar e configurar a biblioteca GTK+ 3.0.](https://www.gtk.org/download/index.php "Página de Download - The GTK+ Project")
 
 Utilizando o gcc e a biblioteca GTK+, digite no seu terminal (Windows, Linux ou macOS):
 
