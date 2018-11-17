@@ -38,10 +38,8 @@ void popular_vendas(Vendas *lista){
     carrinho = criar_carrinho();
     arquivo = fopen("data/vendas.data", "r");
 
-    if (!arquivo){
-        fprintf(stderr, "Ocorreu um erro desconhecido ao abrir o arquivo.\n");
-        exit(1);
-    }
+    if (!arquivo)
+        return;
 
     fscanf(arquivo, "%d ", &quant);
 
@@ -77,11 +75,6 @@ void salvar_vendas(Vendas *lista){
     struct tm *shorario;
     FILE *arquivo;
     arquivo = fopen("data/vendas.data", "w");
-
-    if (!arquivo){
-        fprintf(stderr, "Ocorreu um erro desconhecido ao abrir o arquivo.\n");
-        exit(1);
-    }
 
     fprintf(arquivo, "%d\n", lista->tamanho);
     for (i = 0; i < lista->tamanho; i++){

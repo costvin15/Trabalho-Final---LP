@@ -24,6 +24,7 @@ void vendas_botao(GtkBuilder *);
 void vendas_cliente_completion(GtkWidget *);
 void vendas_produto_completion(GtkWidget *);
 void mensagem_simples_vendas(GtkWindow *, gchar *, gchar *);
+void vendas_clique_duplo(GtkTreeView *, GtkTreePath *, GtkTreeViewColumn *, GtkBuilder *);
 
 void atualizar_valor_final(GtkWidget *, GtkBuilder *);
 void nova_venda_dialog(GtkWidget *, GtkBuilder *);
@@ -87,6 +88,7 @@ void vendas_aba(GtkBuilder *interface, Vendas * vendas){
         gtk_list_store_set(lista_estrutura, &lista_estrutura_primaria, 0, vendas->vendas[i].cliente.nome, 1, produtos, 2, preco, 3, horario, -1);
     }
 
+    g_signal_connect(lista, "row-activated", G_CALLBACK(vendas_clique_duplo), interface);
     vendas_botao(interface);
 }
 
@@ -200,6 +202,74 @@ void mensagem_simples_vendas(GtkWindow *janela, gchar *titulo, gchar *mensagem){
     g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), dialog);
     g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_produtos), NULL);
     gtk_widget_show_all(dialog);
+}
+
+void vendas_clique_duplo(GtkTreeView *_lista, GtkTreePath *caminho, GtkTreeViewColumn *_coluna, GtkBuilder *interface){
+    int *indices_caminho_lista;
+    struct venda venda_atual;
+    GtkBuilder *dialog_interface;
+    const gchar dialog_interface_nome[] = "interfaces/novavenda.xml";
+    GtkWidget *window, *dialog, *inputCliente, *inputDesconto, *inputPrecoFinal, *submit;
+    GtkTreeView *lista;
+    GtkListStore *lista_estrutura;
+    GtkTreeIter lista_estrutura_primaria;
+    GError *erro = NULL;
+
+    if (dialogOpened)
+        return;
+    else
+        dialogOpened = true;
+    
+    indices_caminho_lista = gtk_tree_path_get_indices(caminho);
+    venda_atual = VENDAS_LISTA->vendas[indices_caminho_lista[0]];
+
+    dialog_interface = gtk_builder_new();
+    if (!gtk_builder_add_from_file(dialog_interface, dialog_interface_nome, &erro)){
+        fprintf(stderr, "Nao foi possivel inicializar a GUI: %s\n", erro->message);
+        return ;
+    }
+
+    window = (GtkWidget *) gtk_builder_get_object(interface, "window");
+    dialog = (GtkWidget *) gtk_builder_get_object(dialog_interface, "dialog");
+    inputCliente = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputCliente");
+    inputDesconto = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputDesconto");
+    inputPrecoFinal = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputPrecoFinal");
+    submit = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputSubmit");
+    lista = (GtkTreeView *) gtk_builder_get_object(dialog_interface, "tree_view_carrinho");
+    
+    if (!window || !dialog || !inputCliente || !inputDesconto || !submit || !lista){
+        fprintf(stderr, "Nao ha nenhum objeto com este id.\n");
+        return;
+    }
+
+    g_object_set(inputCliente, "editable", FALSE, NULL);
+    gtk_entry_set_text((GtkEntry *) inputCliente, venda_atual.cliente.nome);
+
+    lista_estrutura = (GtkListStore *) gtk_tree_view_get_model(lista);
+    gtk_list_store_clear(lista_estrutura);
+
+    char preco[40];
+    int i;
+    for (i = 0; i < venda_atual.carrinho.tamanho; i++){
+        sprintf(preco, "R$ %.2lf", venda_atual.carrinho.produtos[i].preco);
+
+        gtk_list_store_append(lista_estrutura, &lista_estrutura_primaria);
+        gtk_list_store_set(lista_estrutura, &lista_estrutura_primaria, 0, venda_atual.carrinho.produtos[i].nome, 1, venda_atual.carrinho.produtos[i].quantidade, 2, preco, -1);
+    }
+    
+    gtk_widget_destroy(submit);
+
+    g_object_set(inputDesconto, "editable", FALSE, NULL);
+    gtk_spin_button_set_value((GtkSpinButton *) inputDesconto, venda_atual.carrinho.descontopercento);
+    
+    sprintf(preco, "Preço Final: R$ %.2lf", venda_atual.carrinho.preco_final);
+    gtk_label_set_text((GtkLabel *) inputPrecoFinal, preco);
+
+    gtk_window_set_title((GtkWindow *) dialog, venda_atual.cliente.nome);
+    gtk_window_set_transient_for((GtkWindow *) dialog, (GtkWindow *) window);
+    gtk_widget_show(dialog);
+    
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_vendas), interface);
 }
 
 void carrinho_dialog(GtkWidget *botao, GtkBuilder *interface){

@@ -35,7 +35,7 @@ void popular_clientes(Clientes *lista){
     int quantidade;
     
     dados = fopen("data/clientes.data", "r");
-    if (dados == NULL)
+    if (!dados)
         return;
     
     fscanf(dados, "%d ", &quantidade);

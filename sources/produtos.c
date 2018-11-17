@@ -36,7 +36,7 @@ void popular_produtos(Produtos *lista){
     int quantidade;
 
     dados = fopen("data/produtos.data", "r");
-    if (dados == NULL)
+    if (!dados)
         return;
     
     fscanf(dados, "%d ", &quantidade);
