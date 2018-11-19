@@ -6,8 +6,11 @@
 
 #include <gtk/gtk.h>
 
+#include <time.h>
 #include <string.h>
 #include <stdbool.h>
+
+#include "pdfgen/pdfgen.h"
 
 #include "headers/vendas.h"
 #include "headers/clientes.h"
@@ -33,6 +36,12 @@ void nova_venda_callback(GtkWidget *, GtkBuilder *);
 void carrinho_dialog(GtkWidget *, GtkBuilder *);
 void recarregar_lista_carrinho(GtkTreeView *);
 void carrinho_callback(GtkWidget *, GtkBuilder *);
+
+void remover_venda_dialog(GtkWidget *, GtkBuilder *);
+void remover_venda_callback(GtkWidget *, int, int *);
+
+void relatorio_dialog(GtkWidget *, GtkBuilder *);
+void relatorio_callback(GtkWidget *, GtkBuilder *);
 
 void vendas_gui(GtkBuilder *interface, Vendas *vendas){
     VENDAS_LISTA = vendas;
@@ -175,13 +184,31 @@ void nova_venda_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
         return;
     }
 
-    int ocorrencias;
+    int i, ocorrencias;
     struct cliente **clientes = buscar_cliente(CLIENTES_LISTA, (char *) gtk_entry_get_text((GtkEntry *) inputCliente), &ocorrencias);
-    
+    struct produto **buscaProduto;
+
     if (ocorrencias > 0)
         if (!CARRINHO->tamanho > 0)
             mensagem_simples_vendas((GtkWindow *) dialog, "Erro", "O carrinho está vazio.");
         else if (strcmp((char *) gtk_entry_get_text((GtkEntry *) inputCliente), clientes[0]->nome) == 0){
+            for (i = 0; i < CARRINHO->tamanho; i++){
+                buscaProduto = buscar_produto(PRODUTOS_LISTA, CARRINHO->produtos[i].nome, &ocorrencias);
+                if (ocorrencias <= 0){
+                    mensagem_simples_vendas((GtkWindow *) dialog, "Erro", "Erro desconhecido.");
+                    return;
+                }
+                
+                if (buscaProduto[0]->EmEstoque - CARRINHO->produtos[i].quantidade < 0){
+                    mensagem_simples_vendas((GtkWindow *) dialog, "Atenção", "Você não tem produtos em estoque suficiente para vender.");
+                    return;
+                }
+
+                buscaProduto[0]->EmEstoque -= CARRINHO->produtos[i].quantidade;
+            }
+            
+            produtos_aba(NULL, NULL);
+
             nova_venda(VENDAS_LISTA, *clientes[0], CARRINHO);
             CARRINHO = criar_carrinho();
             gtk_widget_destroy(dialog);
@@ -288,7 +315,7 @@ void carrinho_dialog(GtkWidget *botao, GtkBuilder *interface){
     dialog_interface = gtk_builder_new();
     if (!gtk_builder_add_from_file(dialog_interface, dialog_interface_nome, &erro)){
         fprintf(stderr, "Nao foi possivel inicializar a GUI: %s\n", erro->message);
-        return ;
+        return;
     }
 
     window = (GtkWidget *) gtk_builder_get_object(interface, "window");
@@ -344,21 +371,207 @@ void carrinho_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
         return;
     }
 
-    int ocorrencias;
+    int ocorrencias, quantidade = gtk_spin_button_get_value((GtkSpinButton *) inputQuantidade);
     struct produto **produtos = buscar_produto(PRODUTOS_LISTA, (char *) gtk_entry_get_text((GtkEntry *) inputProduto), &ocorrencias);
     
     if (ocorrencias > 0)
         if (strcmp((char *) gtk_entry_get_text((GtkEntry *) inputProduto), produtos[0]->nome) == 0){
-            adicionar_produto_carrinho(CARRINHO, *produtos[0], gtk_spin_button_get_value((GtkSpinButton *) inputQuantidade));
-            recarregar_lista_carrinho(lista);
+            if (produtos[0]->EmEstoque - quantidade >= 0){
+                adicionar_produto_carrinho(CARRINHO, *produtos[0], quantidade);
+                recarregar_lista_carrinho(lista);
+            } else
+                mensagem_simples_vendas((GtkWindow *) dialog, "Atenção", "Você tem quantidade insuficiente no estoque.");
         } else
             mensagem_simples_vendas((GtkWindow *) dialog, "Erro", "Nao foi possivel encontrar este produto.");
     else
         mensagem_simples_vendas((GtkWindow *) dialog, "Erro", "Nao foi possivel encontrar este produto.");
 }
 
+void remover_venda_dialog(GtkWidget *botao, GtkBuilder *interface){
+    GtkWidget *dialog, *window;
+    GtkDialogFlags flags;
+    GtkTreeView *lista;
+    GtkTreePath *caminho;
+    GtkTreeSelection *lista_seletor;
+    GtkTreeModel *lista_estrutura;
+    GtkTreeIter lista_estrutura_primaria;
+    int *indices, posicao;
+
+    window = (GtkWidget *) gtk_builder_get_object(interface, "window");
+    lista = (GtkTreeView *) gtk_builder_get_object(interface, "tree_view_vendas");
+    lista_seletor = gtk_tree_view_get_selection(lista);
+    lista_estrutura = gtk_tree_view_get_model(lista);
+
+    if (!gtk_tree_selection_get_selected(lista_seletor, &lista_estrutura, &lista_estrutura_primaria)){
+        mensagem_simples_vendas((GtkWindow *) window, "Atenção", "Selecione alguma venda para remover.");
+        return;
+    } else
+        if (dialogOpened)
+            return;
+        else
+            dialogOpened = true;
+    
+    caminho = gtk_tree_model_get_path(lista_estrutura, &lista_estrutura_primaria);
+    indices = gtk_tree_path_get_indices(caminho);
+    posicao = indices[0];
+
+    flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+    dialog = gtk_message_dialog_new((GtkWindow *) window, flags, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "Você tem certeza em remover a venda nº %d?", posicao + 1);
+    gtk_dialog_add_button((GtkDialog *) dialog, "Sim, remover", 0);
+    gtk_dialog_add_button((GtkDialog *) dialog, "Não, cancelar", 1);
+    gtk_widget_show_all(dialog);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(remover_venda_callback), &posicao);
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_vendas), interface);
+}
+
+void remover_venda_callback(GtkWidget *dialog, int id, int *index){
+    if (id == 0)
+        remover_venda(VENDAS_LISTA, *index);
+    gtk_widget_destroy(dialog);
+}
+
+void relatorio_dialog(GtkWidget *botao, GtkBuilder *interface){
+    GtkBuilder *dialog_interface;
+    const gchar dialog_interface_nome[] = "interfaces/gerarrelatorio.xml";
+    GtkWidget *window, *dialog, *submit;
+    GError *erro = NULL;
+
+    if (dialogOpened)
+        return;
+    else
+        dialogOpened = true;
+
+    dialog_interface = gtk_builder_new();
+    if (!gtk_builder_add_from_file(dialog_interface, dialog_interface_nome, &erro)){
+        fprintf(stderr, "Nao foi possivel inicializar a GUI: %s\n", erro->message);
+        return;
+    }
+
+    window = (GtkWidget *) gtk_builder_get_object(interface, "window");
+    dialog = (GtkWidget *) gtk_builder_get_object(dialog_interface, "dialog");
+    submit = (GtkWidget *) gtk_builder_get_object(dialog_interface, "submit");
+
+    gtk_window_set_title((GtkWindow *) dialog, "Gerar Relatório");
+    gtk_window_set_transient_for((GtkWindow *) dialog, (GtkWindow *) window);
+    gtk_widget_show(dialog);
+
+    g_signal_connect(submit, "clicked", G_CALLBACK(relatorio_callback), dialog_interface);
+    g_signal_connect(dialog, "destroy", G_CALLBACK(recarregar_aba_vendas), interface);
+}
+
+int busca_binaria_relatorio(Vendas *lista, time_t termo, int inicio, int fim){
+    int meio = (inicio + fim) / 2;
+
+    if (lista->vendas[meio].horario == termo)
+        return meio;
+    if (inicio > fim)
+        return inicio;
+    else if (lista->vendas[meio].horario > termo)
+        return busca_binaria_relatorio(lista, termo, inicio, meio - 1);
+    else
+        return busca_binaria_relatorio(lista, termo, meio + 1, fim);
+}
+
+void relatorio_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
+    struct venda *relatorio;
+    GtkWidget *dialog;
+    GtkCalendar *calendario;
+    struct tm data_estrutura = {0};
+    time_t data;
+    struct pdf_doc *relatorio_pdf_doc;
+
+    relatorio = NULL;
+    dialog = (GtkWidget *) gtk_builder_get_object(dialog_interface, "dialog");
+    calendario = (GtkCalendar *) gtk_builder_get_object(dialog_interface, "calendario");
+    gtk_calendar_get_date(calendario, &data_estrutura.tm_year, &data_estrutura.tm_mon, &data_estrutura.tm_mday);
+    data_estrutura.tm_year -= 1900;
+
+    data = mktime(&data_estrutura);
+
+    int prox = busca_binaria_relatorio(VENDAS_LISTA, data, 0, VENDAS_LISTA->tamanho - 1);
+    int encontrados = 0;
+
+    while (VENDAS_LISTA->vendas[prox].horario >= data && VENDAS_LISTA->vendas[prox].horario <= data + 86400){
+        relatorio = (struct venda *) realloc(relatorio, (encontrados + 1) * sizeof(struct venda));
+        relatorio[encontrados] = VENDAS_LISTA->vendas[prox];
+
+        encontrados++;
+        prox++;
+    }
+    
+    char nome_documento[250];
+    strftime(nome_documento, sizeof(nome_documento), "Relatorio - Dia %d/%m/%Y", &data_estrutura);
+
+    struct pdf_info relatorio_pdf_info = {
+        .creator = "Loja NerdZ",
+        .producer = "Loja NerdZ",
+        .author = "Loja NerdZ",
+    };
+
+    strcpy(relatorio_pdf_info.title, nome_documento);
+    strcpy(relatorio_pdf_info.subject, nome_documento);
+
+    relatorio_pdf_doc = pdf_create(PDF_A4_WIDTH, PDF_A4_HEIGHT, &relatorio_pdf_info);
+    struct pdf_object *pagina = pdf_append_page(relatorio_pdf_doc);
+    pdf_set_font(relatorio_pdf_doc, "Helvetica");
+
+    int alturaAtual = 770;
+    char quantidade_vendas_documento[25];
+    sprintf(quantidade_vendas_documento, "Foram realizadas %d venda(s) neste dia.", encontrados);
+
+    pdf_add_text_wrap(relatorio_pdf_doc, pagina, "Loja NerdZ", 20, 60, alturaAtual, PDF_RGB(0, 0, 0), 300, PDF_ALIGN_JUSTIFY);
+    alturaAtual -= 15,
+    pdf_add_line(relatorio_pdf_doc, pagina, 60, alturaAtual, 500, alturaAtual, 2, PDF_BLACK);
+    alturaAtual -= 30;
+    pdf_add_text_wrap(relatorio_pdf_doc, pagina, nome_documento, 16, 60, alturaAtual, PDF_BLACK, 300, PDF_ALIGN_JUSTIFY);
+    alturaAtual -= 30;
+    pdf_set_font(relatorio_pdf_doc, "Helvetica-Bold");
+    pdf_add_text_wrap(relatorio_pdf_doc, pagina, quantidade_vendas_documento, 16, 60, alturaAtual, PDF_BLACK, 300, PDF_ALIGN_JUSTIFY);
+    pdf_set_font(relatorio_pdf_doc, "Helvetica");
+
+    int i, j;
+    char venda_titulo_documento[10];
+    char venda_cliente_documento[110];
+    char venda_produto_documento[175];
+    char venda_produto_quantidade_documento[26];
+
+    for (i = 0; i < encontrados; i++){
+        if (alturaAtual - 150 <= 30){
+            pagina = pdf_append_page(relatorio_pdf_doc);
+            alturaAtual = 770;
+        }
+
+        sprintf(venda_titulo_documento, "Venda %d:", i + 1);
+        sprintf(venda_cliente_documento, "Cliente: %s", relatorio[i].cliente.nome);
+        sprintf(venda_produto_quantidade_documento, "%d produtos vendidos: ", relatorio[i].carrinho.tamanho);
+
+        alturaAtual -= 30;
+        pdf_add_text_wrap(relatorio_pdf_doc, pagina, venda_titulo_documento, 16, 60, alturaAtual, PDF_BLACK, 300, PDF_ALIGN_JUSTIFY);
+        alturaAtual -= 30;
+        pdf_add_text_wrap(relatorio_pdf_doc, pagina, venda_cliente_documento, 16, 60, alturaAtual, PDF_BLACK, 300, PDF_ALIGN_JUSTIFY);
+        alturaAtual -= 25;
+        pdf_add_text_wrap(relatorio_pdf_doc, pagina, venda_produto_quantidade_documento, 16, 60, alturaAtual, PDF_BLACK, 300, PDF_ALIGN_JUSTIFY);
+
+        for (j = 0; j < relatorio[i].carrinho.tamanho; j++){
+            alturaAtual -= 35;
+            sprintf(venda_produto_documento, "Produto: %s\nQuantidade: %d", relatorio[i].carrinho.produtos[j].nome, relatorio[i].carrinho.produtos[j].quantidade);
+            pdf_add_text_wrap(relatorio_pdf_doc, pagina, venda_produto_documento, 15, 75, alturaAtual, PDF_BLACK, 300, PDF_ALIGN_JUSTIFY);
+        }
+        
+        alturaAtual -= 25;
+        pdf_add_line(relatorio_pdf_doc, pagina, 60, alturaAtual, 500, alturaAtual, 2, PDF_BLACK);
+    }
+
+    pdf_save(relatorio_pdf_doc, "Relatorio.pdf");
+    pdf_destroy(relatorio_pdf_doc);
+    gtk_widget_destroy(dialog);
+
+    mensagem_simples_vendas((GtkWindow *) NULL, "Arquivo gerado com sucesso.", "O arquivo Relatorio.pdf foi salvo na pasta do programa.");
+}
+
 void vendas_botao(GtkBuilder *interface){
-    GtkWidget *botao_nova_venda, *botao_carrinho;
+    GtkWidget *botao_nova_venda, *botao_carrinho, *botao_remover_venda, *botao_relatorio;
 
     botao_nova_venda = (GtkWidget *) gtk_builder_get_object(interface, "botao_nova_venda");
     gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_nova_venda, "Nova Venda");
@@ -367,6 +580,14 @@ void vendas_botao(GtkBuilder *interface){
     botao_carrinho = (GtkWidget *) gtk_builder_get_object(interface, "botao_carrinho");
     gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_carrinho, "Carrinho");
     g_signal_connect(botao_carrinho, "clicked", G_CALLBACK(carrinho_dialog), interface);
+
+    botao_remover_venda = (GtkWidget *) gtk_builder_get_object(interface, "botao_remover_venda");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_remover_venda, "Remover Venda");
+    g_signal_connect(botao_remover_venda, "clicked", G_CALLBACK(remover_venda_dialog), interface);
+
+    botao_relatorio = (GtkWidget *) gtk_builder_get_object(interface, "botao_relatorio");
+    gtk_tool_item_set_tooltip_text((GtkToolItem *) botao_relatorio, "Gerar Relatório");
+    g_signal_connect(botao_relatorio, "clicked", G_CALLBACK(relatorio_dialog), interface);
 }
 
 void vendas_cliente_completion(GtkWidget *inputCliente){

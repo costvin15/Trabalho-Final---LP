@@ -99,6 +99,19 @@ void salvar_vendas(Vendas *lista){
     fclose(arquivo);
 }
 
+int buscabinaria(Vendas *lista, long int busca, int inicio, int fim){
+    int meio = (inicio + fim) / 2;
+    if (lista->vendas[meio].horario == busca)
+        return meio;
+    if (inicio > fim)
+        return inicio;
+    else
+        if (lista->vendas[meio].horario > busca)
+            return buscabinaria(lista, busca, inicio, meio - 1);
+        else
+            return buscabinaria(lista, busca, meio + 1, fim);
+}
+
 void adicionar_venda(Vendas *lista, struct comprador cliente, Carrinho *carrinho, time_t horario){
     if (!lista){
         fprintf(stderr, "As vendas precisam ser inicializadas primeiro.\n");
@@ -106,10 +119,13 @@ void adicionar_venda(Vendas *lista, struct comprador cliente, Carrinho *carrinho
     }
 
     lista->vendas = (struct venda *) realloc(lista->vendas, (lista->tamanho + 1) * sizeof(struct venda));
-    lista->vendas[lista->tamanho].index = lista->tamanho;
-    lista->vendas[lista->tamanho].cliente = cliente;
-    lista->vendas[lista->tamanho].horario = (time_t) horario;
-    lista->vendas[lista->tamanho].carrinho = *carrinho;
+
+    int index = buscabinaria(lista, horario, 0, lista->tamanho - 1);
+
+    lista->vendas[index].index = index;
+    lista->vendas[index].cliente = cliente;
+    lista->vendas[index].horario = (time_t) horario;
+    lista->vendas[index].carrinho = *carrinho;
     lista->tamanho++;
 }
 
@@ -120,16 +136,23 @@ void nova_venda(Vendas *lista, struct cliente cliente, Carrinho *carrinho){
     }
 
     lista->vendas = (struct venda *) realloc(lista->vendas, (lista->tamanho + 1) * sizeof(struct venda));
-    lista->vendas[lista->tamanho].index = lista->tamanho;
-    sprintf(lista->vendas[lista->tamanho].cliente.nome, "%s", cliente.nome);
-    sprintf(lista->vendas[lista->tamanho].cliente.endereco, "%s %s - %u, %s, %s - %s", cliente.endereco.logradouro, cliente.endereco.endereco, cliente.endereco.casa, cliente.endereco.bairro, cliente.endereco.cidade, cliente.endereco.estado);
-    sprintf(lista->vendas[lista->tamanho].cliente.telefone, "(%u) %s", cliente.telefone.ddd, cliente.telefone.telefone);
-    time(&(lista->vendas[lista->tamanho].horario));
-    lista->vendas[lista->tamanho].carrinho = *carrinho;
+    
+    time_t horario;
+    time(&horario);
+
+    int index = buscabinaria(lista, horario, 0, lista->tamanho - 1);
+    
+    lista->vendas[index].index = index;
+    sprintf(lista->vendas[index].cliente.nome, "%s", cliente.nome);
+    sprintf(lista->vendas[index].cliente.endereco, "%s %s - %u, %s, %s - %s", cliente.endereco.logradouro, cliente.endereco.endereco, cliente.endereco.casa, cliente.endereco.bairro, cliente.endereco.cidade, cliente.endereco.estado);
+    sprintf(lista->vendas[index].cliente.telefone, "(%u) %s", cliente.telefone.ddd, cliente.telefone.telefone);
+    time(&(lista->vendas[index].horario));
+    lista->vendas[index].carrinho = *carrinho;
     lista->tamanho++;
 }
 
 void remover_venda(Vendas *lista, int index){
     for (; index < lista->tamanho - 1; index++)
         lista->vendas[index] = lista->vendas[index + 1];
+    lista->vendas = (struct venda *) realloc(lista->vendas, --(lista->tamanho) * sizeof(struct cliente));
 }
