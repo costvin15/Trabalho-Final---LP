@@ -47,53 +47,65 @@
                         <property name="orientation">vertical</property>
 
                         <child>
-                            <object class="GtkTreeView" id="tree_view_carrinho">
+                            <object class="GtkScrolledWindow">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="hexpand">True</property>
-                                <property name="vexpand">True</property>
-                                <property name="model">list_store_carrinho</property>
-
-                                <child internal-child="selection">
-                                    <object class="GtkTreeSelection" />
-                                </child>
-                                
                                 <child>
-                                    <object class="GtkTreeViewColumn">
-                                        <property name="title" translatable="yes">Nome</property>
-                                        <child>
-                                            <object class="GtkCellRendererText" />
-                                            <attributes>
-                                                <attribute name="text">0</attribute>
-                                            </attributes>
+                                    <object class="GtkTreeView" id="tree_view_carrinho">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="model">list_store_carrinho</property>
+
+                                        <child internal-child="selection">
+                                            <object class="GtkTreeSelection" />
                                         </child>
-                                    </object>
-                                </child>
-
-                                <child>
-                                    <object class="GtkTreeViewColumn">
-                                        <property name="title" translatable="yes">Quantidade</property>
+                                        
                                         <child>
-                                            <object class="GtkCellRendererText" />
-                                            <attributes>
-                                                <attribute name="text">1</attribute>
-                                            </attributes>
+                                            <object class="GtkTreeViewColumn">
+                                                <property name="title" translatable="yes">Nome</property>
+                                                <child>
+                                                    <object class="GtkCellRendererText" />
+                                                    <attributes>
+                                                        <attribute name="text">0</attribute>
+                                                    </attributes>
+                                                </child>
+                                            </object>
                                         </child>
-                                    </object>
-                                </child>
 
-                                <child>
-                                    <object class="GtkTreeViewColumn">
-                                        <property name="title" translatable="yes">Preço Unitário</property>
                                         <child>
-                                            <object class="GtkCellRendererText" />
-                                            <attributes>
-                                                <attribute name="text">2</attribute>
-                                            </attributes>
+                                            <object class="GtkTreeViewColumn">
+                                                <property name="title" translatable="yes">Quantidade</property>
+                                                <child>
+                                                    <object class="GtkCellRendererText" />
+                                                    <attributes>
+                                                        <attribute name="text">1</attribute>
+                                                    </attributes>
+                                                </child>
+                                            </object>
+                                        </child>
+
+                                        <child>
+                                            <object class="GtkTreeViewColumn">
+                                                <property name="title" translatable="yes">Preço Unitário</property>
+                                                <child>
+                                                    <object class="GtkCellRendererText" />
+                                                    <attributes>
+                                                        <attribute name="text">2</attribute>
+                                                    </attributes>
+                                                </child>
+                                            </object>
                                         </child>
                                     </object>
                                 </child>
                             </object>
+
+                            <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                            </packing>
                         </child>
                     </object>
                 </child>

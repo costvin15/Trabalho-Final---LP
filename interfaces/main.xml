@@ -388,6 +388,14 @@
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkToolButton" id="botao_relatorio">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">toolbutton</property>
+                    <property name="icon_name">appointment-soon</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>

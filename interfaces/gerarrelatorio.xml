@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <requires lib="gtk+" version="3.10" />
+    <object class="GtkDialog" id="dialog">
+        <property name="can_focus">False</property>
+        <property name="border_width">5</property>
+        <property name="resizable">False</property>
+        <property name="window_position">center</property>
+        <property name="default_width">450</property>
+
+        <child internal-child="vbox">
+            <object class="GtkBox">
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">2</property>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label">Seleciona a data que você deseja gerar o relatório</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkCalendar" id="calendario">
+                        <property name="visible">True</property>
+                        <property name="show-details">False</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label"></property>
+                    </object>
+                </child>
+                
+                <child>
+                    <object class="GtkButton" id="submit">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label">Gerar</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
+</interface>

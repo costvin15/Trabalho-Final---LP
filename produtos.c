@@ -34,6 +34,14 @@ void produtos_gui(GtkBuilder *interface, Produtos *produtos){
 }
 
 void produtos_aba(GtkBuilder *interface, Produtos *produtos){
+    static GtkBuilder *mInterface = NULL;
+    if (interface == NULL){
+        interface = mInterface;
+        produtos = PRODUTOS_LISTA;
+    }
+    if (mInterface == NULL)
+        mInterface = interface;
+
     GtkTreeView *lista;
     GtkListStore *lista_estrutura;
     GtkTreeIter lista_estrutura_primaria;
