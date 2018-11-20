@@ -56,8 +56,8 @@ void remover_produto_carrinho(Carrinho *lista, int index){
         fprintf(stderr, "O carrinho precisa ser inicializado primeiro.\n");
         return;
     }
-
-    lista->preco -= lista->produtos[index].preco;
+    
+    lista->preco -= (lista->produtos[index].preco * lista->produtos[index].quantidade);
     lista->preco_final = lista->preco - ((lista->preco * lista->descontopercento) / 100);
     
     for (; index < lista->tamanho - 1; index++)
