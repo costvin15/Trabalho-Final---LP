@@ -57,6 +57,7 @@
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
                                         <property name="model">list_store_carrinho</property>
+                                        <property name="activate-on-single-click">False</property>
 
                                         <child internal-child="selection">
                                             <object class="GtkTreeSelection" />

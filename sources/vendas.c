@@ -154,5 +154,6 @@ void nova_venda(Vendas *lista, struct cliente cliente, Carrinho *carrinho){
 void remover_venda(Vendas *lista, int index){
     for (; index < lista->tamanho - 1; index++)
         lista->vendas[index] = lista->vendas[index + 1];
-    lista->vendas = (struct venda *) realloc(lista->vendas, --(lista->tamanho) * sizeof(struct cliente));
+    lista->vendas = (struct venda *) realloc(lista->vendas, (lista->tamanho - 1) * sizeof(struct venda));
+    lista->tamanho--;
 }
