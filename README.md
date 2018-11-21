@@ -10,7 +10,7 @@ Loja de seguimento de varejo focada em vendas de produtos do mercado nerd, geek,
 
 ### O sistema é capaz de
 
-Registrar, editar e remover clientes, produtos; realizar vendas, salvando todas as informações no computador que o está executando.
+Registrar, editar e remover clientes, produtos; realizar vendas, salvando todas as informações no computador que o está executando, além de gerar um relatório de vendas de uma data específica em PDF.
 
 ### Como compilar
 
@@ -19,7 +19,7 @@ Registrar, editar e remover clientes, produtos; realizar vendas, salvando todas 
 Utilizando o gcc e a biblioteca GTK+, digite no seu terminal (Windows, Linux ou macOS):
 
 ```
-gcc `pkg-config --cflags gtk+-3.0` -o main sources/util.c sources/clientes.c sources/produtos.c sources/vendas.c sources/carrinho.c main.c `pkg-config --libs gtk+-3.0`
+gcc `pkg-config --cflags gtk+-3.0` -o main sources/util.c sources/clientes.c sources/produtos.c sources/vendas.c pdfgen/pdfgen.c sources/carrinho.c main.c icon/icon.o `pkg-config --libs gtk+-3.0`
 ```
 
 (Testado no Windows 10 Pro 1803 e Debian 9.6.0)
