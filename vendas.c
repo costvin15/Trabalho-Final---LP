@@ -143,8 +143,8 @@ void nova_venda_dialog(GtkWidget *botao, GtkBuilder *interface){
     
     gtk_spin_button_set_value((GtkSpinButton *) inputDesconto, CARRINHO->descontopercento);
     
-    char preco[40];
-    sprintf(preco, "Preço Final: R$ %.2lf", CARRINHO->preco_final);
+    char preco[60];
+    sprintf(preco, "Preço Final: R$ %.2lf - Desconto: R$ %.2f", CARRINHO->preco_final, CARRINHO->desconto);
     gtk_label_set_text((GtkLabel *) inputPrecoFinal, preco);
 
     recarregar_lista_carrinho(NULL, 0, lista);
@@ -165,11 +165,11 @@ void atualizar_valor_final(GtkWidget *inputDesconto, GtkBuilder *dialog_interfac
     GtkWidget *inputPrecoFinal;
     inputDesconto = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputDesconto");
     inputPrecoFinal = (GtkWidget *) gtk_builder_get_object(dialog_interface, "inputPrecoFinal");
-    char preco[40];
+    char preco[60];
 
     definir_desconto(CARRINHO, gtk_spin_button_get_value((GtkSpinButton *) inputDesconto));
 
-    sprintf(preco, "Preço Final: R$ %.2lf", CARRINHO->preco_final);
+    sprintf(preco, "Preço Final: R$ %.2lf - Desconto: R$ %.2f", CARRINHO->preco_final, CARRINHO->desconto);
     gtk_label_set_text((GtkLabel *) inputPrecoFinal, preco);
 }
 
@@ -278,7 +278,7 @@ void vendas_clique_duplo(GtkTreeView *_lista, GtkTreePath *caminho, GtkTreeViewC
     lista_estrutura = (GtkListStore *) gtk_tree_view_get_model(lista);
     gtk_list_store_clear(lista_estrutura);
 
-    char preco[40];
+    char preco[60];
     int i;
     for (i = 0; i < venda_atual.carrinho.tamanho; i++){
         sprintf(preco, "R$ %.2lf", venda_atual.carrinho.produtos[i].preco);
@@ -292,7 +292,7 @@ void vendas_clique_duplo(GtkTreeView *_lista, GtkTreePath *caminho, GtkTreeViewC
     g_object_set(inputDesconto, "editable", FALSE, NULL);
     gtk_spin_button_set_value((GtkSpinButton *) inputDesconto, venda_atual.carrinho.descontopercento);
     
-    sprintf(preco, "Preço Final: R$ %.2lf", venda_atual.carrinho.preco_final);
+    sprintf(preco, "Preço Final: R$ %.2lf - Desconto: R$ %.2f", venda_atual.carrinho.preco_final, venda_atual.carrinho.desconto);
     gtk_label_set_text((GtkLabel *) inputPrecoFinal, preco);
 
     gtk_window_set_title((GtkWindow *) dialog, venda_atual.cliente.nome);
@@ -511,6 +511,11 @@ int busca_binaria_relatorio(Vendas *lista, time_t termo, int inicio, int fim){
 }
 
 void relatorio_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
+#ifndef _WIN32
+    mensagem_simples_vendas((GtkWindow *) NULL, "Desculpe-nos.", "Infelizmente, esta funcionalidade esta disponivel por enquanto apenas para computadores Windows.");
+    return;
+#endif
+
     struct venda *relatorio;
     GtkWidget *dialog;
     GtkCalendar *calendario;
@@ -634,7 +639,9 @@ void relatorio_callback(GtkWidget *botao, GtkBuilder *dialog_interface){
     pdf_destroy(relatorio_pdf_doc);
     gtk_widget_destroy(dialog);
 
-    mensagem_simples_vendas((GtkWindow *) NULL, "Arquivo gerado com sucesso.", "O arquivo Relatorio.pdf foi salvo na pasta do programa.");
+#ifdef _WIN32
+    system("Relatorio.pdf");
+#endif
 }
 
 void vendas_botao(GtkBuilder *interface){
