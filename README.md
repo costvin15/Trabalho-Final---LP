@@ -16,10 +16,15 @@ Registrar, editar e remover clientes, produtos; realizar vendas, salvando todas 
 
 [Para compilar, você precisa primeiramente instalar e configurar a biblioteca GTK+ 3.0.](https://www.gtk.org/download/index.php "Página de Download - The GTK+ Project")
 
-Utilizando o gcc e a biblioteca GTK+, digite no seu terminal (Windows, Linux ou macOS):
+Utilizando o gcc e a biblioteca GTK+, digite no seu terminal:
 
+Windows:
 ```
 gcc `pkg-config --cflags gtk+-3.0` -o main sources/util.c sources/clientes.c sources/produtos.c sources/vendas.c pdfgen/pdfgen.c sources/carrinho.c main.c icon/icon.o `pkg-config --libs gtk+-3.0`
+```
+Linux, macOS, outros...:
+```
+gcc `pkg-config --cflags gtk+-3.0` -o main sources/util.c sources/clientes.c sources/produtos.c sources/vendas.c pdfgen/pdfgen.c sources/carrinho.c main.c `pkg-config --libs gtk+-3.0`
 ```
 
 (Testado no Windows 10 Pro 1803 e Debian 9.6.0)
